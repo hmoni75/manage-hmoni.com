@@ -50,7 +50,8 @@ const UsersPage = () => {
             const authRes = await fetch('/api/auth/me');
             const authData = await authRes.json();
 
-            if (!authData.authenticated || authData.user?.role !== 'admin') {
+            const role = authData.user?.role;
+            if (!authData.authenticated || (role !== 'admin' && role !== 'super_admin')) {
                 setIsAdmin(false);
                 setLoading(false);
                 return;

@@ -7,23 +7,23 @@ import Footer from '@/components/Footer';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'HMoni Society | এইচমনি সোসাইটি',
-  description: 'পরিকল্পিত ও আধুনিক পরিবেশবান্ধব আবাসন প্রকল্প - এইচমনি সোসাইটি। আপনার স্বপ্নের প্লট বুকিং করুন আজই।',
-  keywords: ['HMoni Society', 'Housing Society Bangladesh', 'Plot Sale Dhaka', 'Real Estate Bangladesh', 'এইচমনি সোসাইটি'],
+    title: 'HMoni  | এইচমনি  ',
+    description: 'পরিকল্পিত ও আধুনিক পরিবেশবান্ধব আবাসন প্রকল্প - এইচমনি সোসাইটি। আপনার স্বপ্নের প্লট বুকিং করুন আজই।',
+    keywords: ['HMoni ', 'Housing Society Bangladesh', 'Plot Sale Dhaka', 'Real Estate Bangladesh', 'এইচমনি সোসাইটি']
 };
 
 export default function RootLayout({
-  children,
+    children
 }: Readonly<{
-  children: React.ReactNode;
+    children: React.ReactNode;
 }>) {
-  return (
-    <html lang="bn" className="scroll-smooth">
-      <body className={`${inter.className} bg-slate-50 text-slate-900 min-h-screen flex flex-col antialiased`}>
-        <Navbar />
-        <main className="flex-grow">{children}</main>
-        <Footer />
-      </body>
-    </html>
-  );
+    return (
+        <html lang="bn" className="scroll-smooth">
+            <body className={`${inter.className} bg-slate-50 text-slate-900 min-h-screen flex flex-col antialiased`}>
+                <Navbar />
+                <main className="flex-grow">{children}</main>
+                <Footer />
+            </body>
+        </html>
+    );
 }

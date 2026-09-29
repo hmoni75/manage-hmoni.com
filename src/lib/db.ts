@@ -115,7 +115,7 @@ export const MOCK_NOTICES: Notice[] = [
   {
     id: 1,
     title: 'Annual General Meeting (AGM) 2026',
-    content: 'The Annual General Meeting of HMoni Society will take place at the Society Community Center on 25th September 2026 at 10:00 AM. All members are cordially requested to attend.',
+    content: 'The Annual General Meeting of HMoni   will take place at the Society Community Center on 25th September 2026 at 10:00 AM. All members are cordially requested to attend.',
     category: 'AGM',
     is_urgent: 1,
     published_at: '2026-09-01 10:00:00',

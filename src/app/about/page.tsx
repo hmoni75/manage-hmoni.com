@@ -8,9 +8,9 @@ export default function AboutPage() {
             {/* Header */}
             <section className="bg-slate-900 text-white py-16">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
-                    <span className="text-emerald-400 text-xs font-bold uppercase tracking-widest bg-emerald-950 px-3 py-1 rounded-full border border-emerald-800">About HMoni Society</span>
+                    <span className="text-emerald-400 text-xs font-bold uppercase tracking-widest bg-emerald-950 px-3 py-1 rounded-full border border-emerald-800">About HMoni </span>
                     <h1 className="text-3xl sm:text-5xl font-extrabold">আমাদের পরিচিতি ও লক্ষ্য</h1>
-                    <p className="max-w-2xl mx-auto text-slate-300 text-sm leading-relaxed">এইচমনি সোসাইটি (HMoni Society) একটি বিশ্বস্ত ও পরিকল্পিত মডেল টাউন আবাসন প্রকল্প।</p>
+                    <p className="max-w-2xl mx-auto text-slate-300 text-sm leading-relaxed">এইচমনি (HMoni ) একটি বিশ্বস্ত ও পরিকল্পিত মডেল টাউন আবাসন প্রকল্প।</p>
                 </div>
             </section>
 
@@ -58,7 +58,7 @@ export default function AboutPage() {
                     </div>
 
                     <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-200">
-                        <img src="https://images.unsplash.com/photo-1524813686514-a57563d77965?w=1000" alt="HMoni Society Area" className="w-full h-[420px] object-cover" />
+                        <img src="https://images.unsplash.com/photo-1524813686514-a57563d77965?w=1000" alt="HMoni   Area" className="w-full h-[420px] object-cover" />
                         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-8">
                             <div className="text-white space-y-1">
                                 <p className="font-bold text-lg">এইচমনি সোসাইটি মাস্টারপ্ল্যান</p>

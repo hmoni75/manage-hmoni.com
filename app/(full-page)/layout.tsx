@@ -7,8 +7,8 @@ interface SimpleLayoutProps {
 }
 
 export const metadata: Metadata = {
-    title: 'HMoni Society',
-    description: 'HMoni Society Portal',
+    title: 'HMoni Admin Portal',
+    description: 'HMoni Admin Portal',
     icons: {
         icon: '/logo.png'
     }

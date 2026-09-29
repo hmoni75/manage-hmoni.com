@@ -26,7 +26,7 @@ const LandingPage = () => {
                 <div className="py-4 px-4 mx-0 md:mx-6 lg:mx-8 lg:px-8 flex align-items-center justify-content-between relative lg:static">
                     <Link href="/" className="flex align-items-center">
                         <img src="/logo.png" alt="HMoni Society Logo" height="40" className="mr-0 lg:mr-2" />
-                        <span className="text-900 font-bold text-xl line-height-3 mr-8">HMoni Society</span>
+                        <span className="text-900 font-bold text-xl line-height-3 mr-8">HMoni Admin</span>
                     </Link>
                     <StyleClass nodeRef={menuRef as NodeRef} selector="@next" enterClassName="hidden" leaveToClassName="hidden" hideOnOutsideClick>
                         <i ref={menuRef} className="pi pi-bars text-4xl cursor-pointer block lg:hidden text-700"></i>
@@ -506,7 +506,7 @@ const LandingPage = () => {
                         <div className="col-12 md:col-2" style={{ marginTop: '-1.5rem' }}>
                             <Link href="/" className="flex flex-wrap align-items-center justify-content-center md:justify-content-start md:mb-0 mb-3 cursor-pointer">
                                 <img src="/logo.png" alt="HMoni Society Logo" width="40" height="40" className="mr-2" />
-                                <span className="font-bold text-xl text-900">HMoni Society</span>
+                                <span className="font-bold text-xl text-900">HMoni Admin</span>
                             </Link>
                         </div>
 

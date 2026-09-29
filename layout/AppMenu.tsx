@@ -25,30 +25,29 @@ const AppMenu = () => {
         { label: 'My Profile', icon: 'pi pi-fw pi-user', to: '/profile' }
     ];
 
-    // Admin Menu: Full Access
+    // Admin Menu: Full Access to dedicated CMS routes
     const adminMenuItems: AppMenuItem[] = [
         { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' },
-        { label: 'My Profile', icon: 'pi pi-fw pi-user', to: '/profile' },
-        { label: 'Members', icon: 'pi pi-fw pi-users', to: '/members' },
-        { label: 'Users', icon: 'pi pi-fw pi-user-edit', to: '/users' },
-        { label: 'Expenses', icon: 'pi pi-fw pi-wallet', to: '/expenses' },
-        {
-            label: 'Reports',
-            icon: 'pi pi-fw pi-print',
-            items: [
-                { label: 'Overall Ledger', icon: 'pi pi-fw pi-chart-bar', to: '/reports/summary' },
-                { label: 'Member Installment', icon: 'pi pi-fw pi-id-card', to: '/reports/member-sheet' },
-                { label: 'Expenses Ledger', icon: 'pi pi-fw pi-file', to: '/reports/expenses' }
-            ]
-        }
+        { label: 'Hero Carousel', icon: 'pi pi-fw pi-images', to: '/hero' },
+        { label: 'Projects & Highlighted', icon: 'pi pi-fw pi-briefcase', to: '/projects' },
+        { label: 'Services', icon: 'pi pi-fw pi-cog', to: '/services' },
+        { label: 'Process Philosophy', icon: 'pi pi-fw pi-compass', to: '/process' },
+        { label: 'Testimonials / Customers', icon: 'pi pi-fw pi-star', to: '/testimonials' },
+        { label: 'FAQ', icon: 'pi pi-fw pi-question-circle', to: '/faqs' },
+        { label: 'Experience', icon: 'pi pi-fw pi-id-card', to: '/experiences' },
+        { label: 'Tech Stack / Tools', icon: 'pi pi-fw pi-wrench', to: '/techstack' },
+        { label: 'Blog & Resources', icon: 'pi pi-fw pi-book', to: '/blogs' },
+        { label: 'Social Media', icon: 'pi pi-fw pi-share-alt', to: '/socials' },
+        { label: 'Contact Messages', icon: 'pi pi-fw pi-envelope', to: '/contacts' },
+        { label: 'User Management', icon: 'pi pi-fw pi-users', to: '/users' }
     ];
 
     // Pending User Menu (Registered but role is 'user')
     const pendingMenuItems: AppMenuItem[] = [{ label: 'Account Pending Approval', icon: 'pi pi-fw pi-clock', to: '/' }];
 
     const getMenuItems = () => {
-        if (userRole === 'admin') return adminMenuItems;
-        if (userRole === 'member') return memberMenuItems;
+        if (userRole === 'admin' || userRole === 'super_admin') return adminMenuItems;
+        if (userRole === 'member') return adminMenuItems;
         return pendingMenuItems;
     };
 

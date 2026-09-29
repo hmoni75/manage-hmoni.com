@@ -1,237 +1,99 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
 
+import React, { useEffect, useState } from 'react';
 import { Button } from 'primereact/button';
-import { Column } from 'primereact/column';
-import { DataTable } from 'primereact/datatable';
-import { Toast } from 'primereact/toast';
-import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 
-interface SummaryData {
-    totalDeposit: number;
-    totalPenalty?: number;
-    totalRealized?: number;
-    totalShares: number;
-    totalMembers?: number;
-    totalExpected?: number;
-    totalExpenses: number;
-    netBalance: number;
-    totalSurplusDeficit?: number;
+interface SectionCard {
+    title: string;
+    route: string;
+    icon: string;
+    color: string;
+    bg: string;
+    api: string;
+    description: string;
 }
 
-const Dashboard = () => {
-    const [userRole, setUserRole] = useState<string>('');
-    const [summary, setSummary] = useState<SummaryData>({
-        totalDeposit: 0,
-        totalShares: 0,
-        totalExpenses: 0,
-        netBalance: 0
-    });
-    const [recentMembers, setRecentMembers] = useState<any[]>([]);
-    const [recentExpenses, setRecentExpenses] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
-    const toast = useRef<Toast>(null);
+const sections: SectionCard[] = [
+    { title: 'Hero Carousel', route: '/hero', icon: 'pi-images', color: 'text-indigo-600', bg: 'bg-indigo-100', api: '/api/hero', description: 'Homepage banner slides and calls to action' },
+    { title: 'Projects', route: '/projects', icon: 'pi-briefcase', color: 'text-blue-600', bg: 'bg-blue-100', api: '/api/projects', description: 'Portfolio project showcases & highlighted works' },
+    { title: 'Services', route: '/services', icon: 'pi-cog', color: 'text-teal-600', bg: 'bg-teal-100', api: '/api/services', description: 'Offered services & solution categories' },
+    { title: 'Process Philosophy', route: '/process', icon: 'pi-compass', color: 'text-cyan-600', bg: 'bg-cyan-100', api: '/api/process', description: 'Project workflow and development process' },
+    { title: 'Testimonials', route: '/testimonials', icon: 'pi-star', color: 'text-yellow-600', bg: 'bg-yellow-100', api: '/api/testimonials', description: 'Client feedback, reviews, and ratings' },
+    { title: 'FAQs', route: '/faqs', icon: 'pi-question-circle', color: 'text-green-600', bg: 'bg-green-100', api: '/api/faqs', description: 'Frequently asked questions & answers' },
+    { title: 'Experience', route: '/experiences', icon: 'pi-id-card', color: 'text-purple-600', bg: 'bg-purple-100', api: '/api/experiences', description: 'Work history, positions, and company roles' },
+    { title: 'Tech Stack', route: '/techstack', icon: 'pi-wrench', color: 'text-pink-600', bg: 'bg-pink-100', api: '/api/techstack', description: 'Frameworks, technologies, and proficiency' },
+    { title: 'Blog & Resources', route: '/blogs', icon: 'pi-book', color: 'text-orange-600', bg: 'bg-orange-100', api: '/api/blogs', description: 'Articles, published blogs, and resources' },
+    { title: 'Social Media', route: '/socials', icon: 'pi-share-alt', color: 'text-blue-500', bg: 'bg-blue-50', api: '/api/socials', description: 'Social profiles on GitHub, LinkedIn, Facebook' },
+    { title: 'Contact Messages', route: '/contacts', icon: 'pi-envelope', color: 'text-red-600', bg: 'bg-red-100', api: '/api/contacts', description: 'Messages and inquiries sent by visitors' }
+];
 
-    const formatCurrency = (amount: number) => {
-        return (
-            '৳ ' +
-            Number(amount || 0).toLocaleString('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
+export default function DashboardPage() {
+    const [counts, setCounts] = useState<Record<string, number>>({});
+    const [loading, setLoading] = useState(true);
+
+    const loadCounts = async () => {
+        setLoading(true);
+        const newCounts: Record<string, number> = {};
+        await Promise.all(
+            sections.map(async (sec) => {
+                try {
+                    const res = await fetch(sec.api, { cache: 'no-store' });
+                    const json = await res.json();
+                    if (json.success && Array.isArray(json.data)) {
+                        newCounts[sec.title] = json.data.length;
+                    } else {
+                        newCounts[sec.title] = 0;
+                    }
+                } catch {
+                    newCounts[sec.title] = 0;
+                }
             })
         );
+        setCounts(newCounts);
+        setLoading(false);
     };
 
     useEffect(() => {
-        const fetchDashboardData = async () => {
-            try {
-                // Check current user role
-                const authRes = await fetch('/api/auth/me', { cache: 'no-store' });
-                const authData = await authRes.json();
-                if (authData.authenticated && authData.user) {
-                    const role = authData.user.role || 'user';
-                    setUserRole(role);
-
-                    // If role is unapproved 'user', stop fetching dashboard data
-                    if (role === 'user') {
-                        setLoading(false);
-                        return;
-                    }
-                }
-
-                // Concurrent fetch with no-store cache to ensure real-time fresh DB data
-                const [sumRes, memRes, expRes] = await Promise.all([fetch('/api/summary', { cache: 'no-store' }), fetch('/api/members', { cache: 'no-store' }), fetch('/api/expenses', { cache: 'no-store' })]);
-
-                const sumJson = await sumRes.json();
-                const memJson = await memRes.json();
-                const expJson = await expRes.json();
-
-                if (sumJson.success && sumJson.data) {
-                    setSummary(sumJson.data);
-                } else if (sumJson.error) {
-                    toast.current?.show({ severity: 'error', summary: 'Error', detail: sumJson.error });
-                }
-
-                if (memJson.success && Array.isArray(memJson.data)) {
-                    setRecentMembers(memJson.data.slice(0, 5));
-                }
-
-                if (expJson.success && Array.isArray(expJson.data)) {
-                    setRecentExpenses(expJson.data.slice(0, 5));
-                }
-            } catch (err) {
-                console.error('Failed to load dashboard summary:', err);
-                toast.current?.show({ severity: 'error', summary: 'Network Error', detail: 'Failed to connect to backend APIs' });
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchDashboardData();
-
-        window.addEventListener('focus', fetchDashboardData);
-        return () => {
-            window.removeEventListener('focus', fetchDashboardData);
-        };
+        loadCounts();
     }, []);
-
-    if (!loading && userRole === 'user') {
-        return (
-            <div className="surface-card p-6 shadow-2 border-round-xl text-center my-6 max-w-30rem mx-auto">
-                <i className="pi pi-clock text-6xl text-yellow-500 mb-3 block" />
-                <h3 className="text-2xl font-bold text-900 mb-2">Account Pending Approval</h3>
-                <p className="text-600 line-height-3 mb-4">
-                    Thank you for signing up with <strong>HMoni Society</strong>. Your registration is currently pending administrator approval. Once an administrator approves your account and sets your role to <strong>Member</strong> or{' '}
-                    <strong>Admin</strong>, you will gain access to the dashboard and financial ledger.
-                </p>
-                <div className="p-3 bg-yellow-50 border-1 border-yellow-200 border-round text-yellow-900 text-sm font-semibold">Status: Pending Role Assignment by Admin</div>
-            </div>
-        );
-    }
 
     return (
         <div>
-            <Toast ref={toast} position="top-right" />
-
             {/* Header Banner */}
-            <div className="surface-card p-4 shadow-2 border-round-xl mb-4 text-center">
-                <h2 className="text-3xl font-bold text-900 mb-1">HMoni Society</h2>
-                <p className="text-600 font-medium m-0">HMoni City, Bongaon, Savar, Dhaka</p>
-                <div className="text-primary font-bold text-xl mt-2">Financial Dashboard & Ledger Overview</div>
+            <div className="surface-card p-4 shadow-2 border-round-xl mb-4 flex flex-column md:flex-row justify-content-between align-items-center gap-3">
+                <div>
+                    <h2 className="text-3xl font-bold text-900 m-0">HMoni CMS & Portfolio Dashboard</h2>
+                    <p className="text-600 font-medium m-0 mt-1">Directly manage each section via dedicated routes with full add, edit, and delete controls.</p>
+                </div>
+                <Button label="Refresh Overview" icon="pi pi-refresh" severity="secondary" outlined onClick={loadCounts} loading={loading} />
             </div>
 
-            {/* 4 PDF Summary Cards */}
+            {/* Quick Section Cards Grid */}
             <div className="grid">
-                <div className="col-12 lg:col-6 xl:col-3">
-                    <div className="card mb-0 shadow-2 border-round-xl surface-card">
-                        <div className="flex justify-content-between mb-3">
-                            <div>
-                                <span className="block text-600 font-bold mb-2">Total Deposit</span>
-                                <div className="text-900 font-bold text-2xl text-blue-600">{formatCurrency(summary.totalDeposit)}</div>
+                {sections.map((sec) => (
+                    <div key={sec.title} className="col-12 sm:col-6 lg:col-4 xl:col-3">
+                        <Link href={sec.route} className="no-underline">
+                            <div className="card mb-0 shadow-2 border-round-xl surface-card hover:surface-hover transition-all transition-duration-200 cursor-pointer h-full flex flex-column justify-content-between">
+                                <div>
+                                    <div className="flex justify-content-between align-items-center mb-3">
+                                        <span className="block text-900 font-bold text-lg">{sec.title}</span>
+                                        <div className={`flex align-items-center justify-content-center ${sec.bg} border-round-circle`} style={{ width: '2.8rem', height: '2.8rem' }}>
+                                            <i className={`pi ${sec.icon} ${sec.color} text-xl`} />
+                                        </div>
+                                    </div>
+                                    <p className="text-500 text-sm m-0 line-height-3">{sec.description}</p>
+                                </div>
+                                <div className="flex justify-content-between align-items-center mt-3 pt-3 border-top-1 surface-border">
+                                    <span className="text-700 font-semibold text-xs">Total Records</span>
+                                    <span className={`font-bold text-xl ${sec.color}`}>{counts[sec.title] ?? '-'}</span>
+                                </div>
                             </div>
-                            <div className="flex align-items-center justify-content-center bg-blue-100 border-round-circle" style={{ width: '3rem', height: '3rem' }}>
-                                <i className="pi pi-wallet text-blue-600 text-2xl" />
-                            </div>
-                        </div>
-                        <span className="text-500 font-medium">Total Member Deposits Received</span>
+                        </Link>
                     </div>
-                </div>
-
-                <div className="col-12 lg:col-6 xl:col-3">
-                    <div className="card mb-0 shadow-2 border-round-xl surface-card">
-                        <div className="flex justify-content-between mb-3">
-                            <div>
-                                <span className="block text-600 font-bold mb-2">Total Shares</span>
-                                <div className="text-900 font-bold text-2xl text-orange-600">{summary.totalShares} Units</div>
-                            </div>
-                            <div className="flex align-items-center justify-content-center bg-orange-100 border-round-circle" style={{ width: '3rem', height: '3rem' }}>
-                                <i className="pi pi-chart-pie text-orange-600 text-2xl" />
-                            </div>
-                        </div>
-                        <span className="text-500 font-medium">Active Member Shares Count</span>
-                    </div>
-                </div>
-
-                <div className="col-12 lg:col-6 xl:col-3">
-                    <div className="card mb-0 shadow-2 border-round-xl surface-card">
-                        <div className="flex justify-content-between mb-3">
-                            <div>
-                                <span className="block text-600 font-bold mb-2">Total Expenses</span>
-                                <div className="text-900 font-bold text-2xl text-purple-600">{formatCurrency(summary.totalExpenses)}</div>
-                            </div>
-                            <div className="flex align-items-center justify-content-center bg-purple-100 border-round-circle" style={{ width: '3rem', height: '3rem' }}>
-                                <i className="pi pi-shopping-bag text-purple-600 text-2xl" />
-                            </div>
-                        </div>
-                        <span className="text-500 font-medium">Total Expenses & Installments Paid</span>
-                    </div>
-                </div>
-
-                <div className="col-12 lg:col-6 xl:col-3">
-                    <div className="card mb-0 shadow-2 border-round-xl surface-card">
-                        <div className="flex justify-content-between mb-3">
-                            <div>
-                                <span className="block text-600 font-bold mb-2">Net Balance</span>
-                                <div className={`font-bold text-2xl ${summary.netBalance >= 0 ? 'text-green-600' : 'text-red-600'}`}>{formatCurrency(summary.netBalance)}</div>
-                            </div>
-                            <div className="flex align-items-center justify-content-center bg-green-100 border-round-circle" style={{ width: '3rem', height: '3rem' }}>
-                                <i className="pi pi-dollar text-green-600 text-2xl" />
-                            </div>
-                        </div>
-                        <span className="text-500 font-medium">Total Deposit - Total Expenses</span>
-                    </div>
-                </div>
-            </div>
-
-            {/* Preview Tables Section */}
-            <div className="grid mt-4">
-                <div className="col-12 lg:col-6">
-                    <div className="card shadow-2 border-round-xl surface-card">
-                        <div className="flex justify-content-between align-items-center mb-3">
-                            <h5 className="m-0 font-bold text-900">Recent Members</h5>
-                            <Link href="/members">
-                                <Button label="View All" icon="pi pi-arrow-right" text iconPos="right" />
-                            </Link>
-                        </div>
-                        <DataTable value={recentMembers} rows={5} loading={loading} responsiveLayout="scroll">
-                            <Column field="sl_no" header="SL" style={{ width: '10%' }} />
-                            <Column
-                                field="name"
-                                header="Name"
-                                style={{ width: '35%' }}
-                                body={(m) => (
-                                    <Link href={`/members/${m.id}`} className="font-bold text-primary hover:underline flex align-items-center gap-1">
-                                        <i className="pi pi-user text-xs" />
-                                        {m.name}
-                                    </Link>
-                                )}
-                            />
-                            <Column field="mobile" header="Mobile" style={{ width: '25%' }} />
-                            <Column field="total_realized" header="Total Realized" body={(d) => formatCurrency(d.total_realized)} style={{ width: '30%' }} />
-                        </DataTable>
-                    </div>
-                </div>
-
-                <div className="col-12 lg:col-6">
-                    <div className="card shadow-2 border-round-xl surface-card">
-                        <div className="flex justify-content-between align-items-center mb-3">
-                            <h5 className="m-0 font-bold text-900">Recent Expenses</h5>
-                            <Link href="/expenses">
-                                <Button label="View All" icon="pi pi-arrow-right" text iconPos="right" />
-                            </Link>
-                        </div>
-                        <DataTable value={recentExpenses} rows={5} loading={loading} responsiveLayout="scroll">
-                            <Column field="sl_no" header="SL" style={{ width: '10%' }} />
-                            <Column field="expense_title" header="Item Title" style={{ width: '40%' }} />
-                            <Column field="payment_method" header="Payment" style={{ width: '20%' }} />
-                            <Column field="amount" header="Amount" body={(d) => formatCurrency(d.amount)} style={{ width: '30%' }} />
-                        </DataTable>
-                    </div>
-                </div>
+                ))}
             </div>
         </div>
     );
-};
-
-export default Dashboard;
+}

@@ -6,15 +6,15 @@ interface AppLayoutProps {
 }
 
 export const metadata: Metadata = {
-    title: 'HMoni Society',
-    description: 'Official Dashboard for HMoni Society',
+    title: 'HMoni Admin Portal',
+    description: 'Official Dashboard for HMoni Admin Portal',
     robots: { index: false, follow: false },
     viewport: { initialScale: 1, width: 'device-width' },
     openGraph: {
         type: 'website',
-        title: 'HMoni Society',
+        title: 'HMoni Admin Portal',
         url: 'https://manage-hmoni.com/',
-        description: 'Official Dashboard for HMoni Society',
+        description: 'Official Dashboard for HMoni Admin Portal',
         images: ['/logo.png'],
         ttl: 604800
     },
