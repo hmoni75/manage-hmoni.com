@@ -1,66 +1,79 @@
 import { NextResponse } from 'next/server';
-import pool, { initDB } from '@/lib/db';
+import pool from '@/lib/db';
 import { RowDataPacket, ResultSetHeader } from 'mysql2';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  try {
-    await initDB();
-    const [rows] = await pool.execute<RowDataPacket[]>('SELECT * FROM testimonials ORDER BY order_index ASC, id DESC');
-    return NextResponse.json({ success: true, data: rows });
-  } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
-  }
+    try {
+        const [rows] = await pool.execute<RowDataPacket[]>('SELECT * FROM testimonials ORDER BY id ASC');
+        return NextResponse.json({ success: true, data: rows });
+    } catch (error: any) {
+        console.error('Testimonials GET error:', error);
+        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
 }
 
 export async function POST(req: Request) {
-  try {
-    await initDB();
-    const body = await req.json();
-    const { client_name, designation, company, comment, rating, avatar_url, order_index } = body;
+    try {
+        const body = await req.json();
+        const { client_name, client_title, content, rating, image_url, company, author, role, avatar } = body;
 
-    const [result] = await pool.execute<ResultSetHeader>(
-      'INSERT INTO testimonials (client_name, designation, company, comment, rating, avatar_url, order_index) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [client_name, designation || '', company || '', comment, rating || 5, avatar_url || '', order_index || 0]
-    );
+        const finalName = client_name || author || '';
+        const finalTitle = client_title || role || '';
+        const finalImage = image_url || avatar || '';
 
-    return NextResponse.json({ success: true, id: result.insertId, message: 'Testimonial created' });
-  } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
-  }
+        const [result] = await pool.execute<ResultSetHeader>(
+            `INSERT INTO testimonials 
+            (client_name, client_title, content, rating, image_url, company, author, role, avatar) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [finalName, finalTitle, content || '', Number(rating) || 5, finalImage, company || '', finalName, finalTitle, finalImage]
+        );
+
+        return NextResponse.json({ success: true, id: result.insertId, message: 'Testimonial created' });
+    } catch (error: any) {
+        console.error('Testimonials POST error:', error);
+        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
 }
 
 export async function PUT(req: Request) {
-  try {
-    await initDB();
-    const body = await req.json();
-    const { id, client_name, designation, company, comment, rating, avatar_url, order_index } = body;
+    try {
+        const body = await req.json();
+        const { id, client_name, client_title, content, rating, image_url, company, author, role, avatar } = body;
 
-    if (!id) return NextResponse.json({ success: false, error: 'ID is required' }, { status: 400 });
+        if (!id) return NextResponse.json({ success: false, error: 'Testimonial ID is required' }, { status: 400 });
 
-    await pool.execute(
-      'UPDATE testimonials SET client_name = ?, designation = ?, company = ?, comment = ?, rating = ?, avatar_url = ?, order_index = ? WHERE id = ?',
-      [client_name, designation || '', company || '', comment, rating || 5, avatar_url || '', order_index || 0, id]
-    );
+        const finalName = client_name || author || '';
+        const finalTitle = client_title || role || '';
+        const finalImage = image_url || avatar || '';
 
-    return NextResponse.json({ success: true, message: 'Testimonial updated' });
-  } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
-  }
+        await pool.execute(
+            `UPDATE testimonials SET 
+            client_name = ?, client_title = ?, content = ?, rating = ?, image_url = ?, 
+            company = ?, author = ?, role = ?, avatar = ? 
+            WHERE id = ?`,
+            [finalName, finalTitle, content || '', Number(rating) || 5, finalImage, company || '', finalName, finalTitle, finalImage, id]
+        );
+
+        return NextResponse.json({ success: true, message: 'Testimonial updated' });
+    } catch (error: any) {
+        console.error('Testimonials PUT error:', error);
+        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
 }
 
 export async function DELETE(req: Request) {
-  try {
-    await initDB();
-    const { searchParams } = new URL(req.url);
-    const id = searchParams.get('id');
+    try {
+        const { searchParams } = new URL(req.url);
+        const id = searchParams.get('id');
 
-    if (!id) return NextResponse.json({ success: false, error: 'ID is required' }, { status: 400 });
+        if (!id) return NextResponse.json({ success: false, error: 'Testimonial ID is required' }, { status: 400 });
 
-    await pool.execute('DELETE FROM testimonials WHERE id = ?', [id]);
-    return NextResponse.json({ success: true, message: 'Testimonial deleted' });
-  } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
-  }
+        await pool.execute('DELETE FROM testimonials WHERE id = ?', [id]);
+        return NextResponse.json({ success: true, message: 'Testimonial deleted' });
+    } catch (error: any) {
+        console.error('Testimonials DELETE error:', error);
+        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
 }
