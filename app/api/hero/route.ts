@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   try {
     await initDB();
-    const [rows] = await pool.execute<RowDataPacket[]>('SELECT * FROM hero_slides ORDER BY order_index ASC, id DESC');
+    const [rows] = await pool.execute<RowDataPacket[]>('SELECT * FROM hero_slides ORDER BY sort_order ASC, id DESC');
     return NextResponse.json({ success: true, data: rows });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
@@ -18,11 +18,11 @@ export async function POST(req: Request) {
   try {
     await initDB();
     const body = await req.json();
-    const { title, subtitle, button_text, button_link, image_url, order_index } = body;
+    const { title, subtitle, button_text, button_link, image_url, sort_order } = body;
 
     const [result] = await pool.execute<ResultSetHeader>(
-      'INSERT INTO hero_slides (title, subtitle, button_text, button_link, image_url, order_index) VALUES (?, ?, ?, ?, ?, ?)',
-      [title, subtitle || '', button_text || 'Explore More', button_link || '#projects', image_url, order_index || 0]
+      'INSERT INTO hero_slides (title, subtitle, button_text, button_link, image_url, sort_order) VALUES (?, ?, ?, ?, ?, ?)',
+      [title, subtitle || '', button_text || 'Explore More', button_link || '#projects', image_url || '', sort_order || 0]
     );
 
     return NextResponse.json({ success: true, id: result.insertId, message: 'Hero slide created' });
@@ -35,13 +35,13 @@ export async function PUT(req: Request) {
   try {
     await initDB();
     const body = await req.json();
-    const { id, title, subtitle, button_text, button_link, image_url, order_index } = body;
+    const { id, title, subtitle, button_text, button_link, image_url, sort_order } = body;
 
     if (!id) return NextResponse.json({ success: false, error: 'Slide ID is required' }, { status: 400 });
 
     await pool.execute(
-      'UPDATE hero_slides SET title = ?, subtitle = ?, button_text = ?, button_link = ?, image_url = ?, order_index = ? WHERE id = ?',
-      [title, subtitle || '', button_text || 'Explore More', button_link || '#projects', image_url, order_index || 0, id]
+      'UPDATE hero_slides SET title = ?, subtitle = ?, button_text = ?, button_link = ?, image_url = ?, sort_order = ? WHERE id = ?',
+      [title, subtitle || '', button_text || 'Explore More', button_link || '#projects', image_url || '', sort_order || 0, id]
     );
 
     return NextResponse.json({ success: true, message: 'Hero slide updated' });
