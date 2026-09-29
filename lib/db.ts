@@ -186,6 +186,156 @@ export async function initDB() {
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
         `);
 
+        // 9. Hero Slides table
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS hero_slides (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                title VARCHAR(255) NOT NULL,
+                subtitle TEXT,
+                button_text VARCHAR(100) DEFAULT 'Explore More',
+                button_link VARCHAR(255) DEFAULT '#projects',
+                image_url VARCHAR(500) NOT NULL,
+                order_index INT DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        `);
+
+        // 10. Projects table
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS projects (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                title VARCHAR(255) NOT NULL,
+                category VARCHAR(100) DEFAULT 'Web Development',
+                description TEXT NOT NULL,
+                image_url VARCHAR(500) NOT NULL,
+                project_url VARCHAR(255),
+                is_highlighted TINYINT(1) DEFAULT 0,
+                order_index INT DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        `);
+
+        // 11. Services table
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS services (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                title VARCHAR(255) NOT NULL,
+                icon VARCHAR(100) DEFAULT 'Code',
+                short_description TEXT NOT NULL,
+                full_description TEXT,
+                price_starting VARCHAR(100),
+                order_index INT DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        `);
+
+        // 12. Process Philosophy table
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS process_philosophy (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                step_number INT NOT NULL,
+                title VARCHAR(255) NOT NULL,
+                description TEXT NOT NULL,
+                icon VARCHAR(100) DEFAULT 'Compass',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        `);
+
+        // 13. Testimonials table
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS testimonials (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                client_name VARCHAR(150) NOT NULL,
+                designation VARCHAR(150),
+                company VARCHAR(150),
+                comment TEXT NOT NULL,
+                rating INT DEFAULT 5,
+                avatar_url VARCHAR(500),
+                order_index INT DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        `);
+
+        // 14. FAQs table
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS faqs (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                question VARCHAR(500) NOT NULL,
+                answer TEXT NOT NULL,
+                category VARCHAR(100) DEFAULT 'General',
+                order_index INT DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        `);
+
+        // 15. Experiences table
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS experiences (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                designation VARCHAR(200) NOT NULL,
+                company_name VARCHAR(200) NOT NULL,
+                duration VARCHAR(100) NOT NULL,
+                description TEXT,
+                location VARCHAR(150),
+                order_index INT DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        `);
+
+        // 16. Tech Stack table
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS tech_stack (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(100) NOT NULL,
+                category VARCHAR(100) DEFAULT 'Frontend',
+                icon_url VARCHAR(500),
+                proficiency_level INT DEFAULT 90,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        `);
+
+        // 17. Blogs table
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS blogs (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                title VARCHAR(255) NOT NULL,
+                slug VARCHAR(255) NOT NULL UNIQUE,
+                excerpt TEXT NOT NULL,
+                content LONGTEXT NOT NULL,
+                cover_image VARCHAR(500),
+                author_name VARCHAR(100) DEFAULT 'HMoni Team',
+                read_time VARCHAR(50) DEFAULT '5 min read',
+                published_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        `);
+
+        // 18. Social Links table
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS social_links (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                platform VARCHAR(100) NOT NULL,
+                url VARCHAR(500) NOT NULL,
+                icon VARCHAR(100) DEFAULT 'Globe',
+                is_active TINYINT(1) DEFAULT 1,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        `);
+
+        // 19. Contacts table
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS contacts (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(150) NOT NULL,
+                email VARCHAR(150) NOT NULL,
+                phone VARCHAR(50),
+                subject VARCHAR(255),
+                message TEXT NOT NULL,
+                status ENUM('unread', 'read', 'replied') DEFAULT 'unread',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        `);
+
         isInitialized = true;
     } catch (error) {
         console.error('Failed to initialize database tables:', error);
