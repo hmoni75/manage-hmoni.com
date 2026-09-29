@@ -8,7 +8,7 @@ export async function middleware(request: NextRequest) {
 
     const user = token ? await verifyToken(token) : null;
     const isAuthenticated = !!user;
-    const isAdmin = user?.role === 'admin';
+    const isAdmin = user?.role === 'admin' || user?.role === 'super_admin';
 
     const isAuthPage = pathname.startsWith('/auth') || pathname.startsWith('/landing') || pathname.startsWith('/documentation');
     const isPublicStatic =

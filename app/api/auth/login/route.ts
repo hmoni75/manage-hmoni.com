@@ -17,7 +17,7 @@ export async function POST(request: Request) {
 
         // Fetch active user from MySQL database
         const [rows] = await pool.execute<RowDataPacket[]>(
-            'SELECT id, name, email, password, role FROM users WHERE email = ? AND deleted_at IS NULL',
+            'SELECT id, name, email, password, role FROM users WHERE email = ?',
             [normalizedEmail]
         );
 
