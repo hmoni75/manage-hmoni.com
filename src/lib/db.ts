@@ -115,7 +115,7 @@ export const MOCK_NOTICES: Notice[] = [
   {
     id: 1,
     title: 'Annual General Meeting (AGM) 2026',
-    content: 'The Annual General Meeting of Nobodhara Aryan Society will take place at the Society Community Center on 25th September 2026 at 10:00 AM. All members are cordially requested to attend.',
+    content: 'The Annual General Meeting of HMoni Society will take place at the Society Community Center on 25th September 2026 at 10:00 AM. All members are cordially requested to attend.',
     category: 'AGM',
     is_urgent: 1,
     published_at: '2026-09-01 10:00:00',
@@ -155,13 +155,18 @@ export const MOCK_INQUIRIES: Inquiry[] = [
 let pool: mysql.Pool | null = null;
 
 export function getDbPool(): mysql.Pool | null {
-  if (process.env.DB_HOST && process.env.DB_USER && process.env.DB_NAME) {
+  const host = process.env.DB_HOST || '51.79.229.154';
+  const user = process.env.DB_USER || 'hmoni24';
+  const password = process.env.DB_PASSWORD || '15HBF&~AVNqu';
+  const database = process.env.DB_NAME || 'hmoni24_db';
+
+  if (host && user && database) {
     if (!pool) {
       pool = mysql.createPool({
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD || '',
-        database: process.env.DB_NAME,
+        host,
+        user,
+        password,
+        database,
         port: Number(process.env.DB_PORT) || 3306,
         waitForConnections: true,
         connectionLimit: 10,

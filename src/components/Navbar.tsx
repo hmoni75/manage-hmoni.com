@@ -43,10 +43,10 @@ export default function Navbar() {
             </div>
             <div>
               <span className="block font-bold text-xl sm:text-2xl text-slate-900 tracking-tight leading-none group-hover:text-emerald-700 transition-colors">
-                Nobodhara Aryan
+                HMoni
               </span>
               <span className="block text-xs font-semibold tracking-widest text-emerald-600 uppercase mt-1">
-                Society • নবধারা আরিয়ান সোসাইটি
+                Society • এইচমনি সোসাইটি
               </span>
             </div>
           </Link>

@@ -100,7 +100,7 @@ export default function ContactPage() {
               <div>
                 <h4 className="font-bold text-slate-900">ইমেইল ঠিকানা</h4>
                 <p className="text-xs text-slate-600 mt-1">
-                  info@nobodharaaryan.com
+                  info@hmoni.com
                 </p>
               </div>
             </div>

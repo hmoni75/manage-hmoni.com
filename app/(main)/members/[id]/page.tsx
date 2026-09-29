@@ -470,9 +470,9 @@ const MemberInstallmentsPage = () => {
                     <div className="printable-area hidden">
                         <div className="text-center border-bottom-2 surface-border pb-3 mb-4">
                             <h2 className="text-3xl font-bold text-900 m-0" style={{ color: '#1B365D' }}>
-                                নবধারা আরিয়ান সোসাইটি
+                                এইচমনি সোসাইটি
                             </h2>
-                            <div className="text-700 font-medium mt-1">আরিয়ান সিটি, বনগাঁও, সাভার, ঢাকা — ১লা জানুয়ারি, ২০২৬ খ্রিস্টাব্দ</div>
+                            <div className="text-700 font-medium mt-1">এইচমনি সিটি, বনগাঁও, সাভার, ঢাকা — ১লা জানুয়ারি, ২০২৬ খ্রিস্টাব্দ</div>
                             <div className="text-xl font-bold text-primary mt-2">১ম পাতা - সদস্য কিস্তি হিসাব ({member.name})</div>
                         </div>
 

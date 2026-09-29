@@ -60,8 +60,8 @@ const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
             <Toast ref={toast} position="top-right" />
 
             <Link href="/" className="layout-topbar-logo">
-                <img src="/logo.png" style={{ height: '35px', width: 'auto' }} alt="Nobodhara Aryan Society Logo" />
-                <span className="font-bold text-xl ml-2">Nobodhara Aryan Society</span>
+                <img src="/logo.png" style={{ height: '35px', width: 'auto' }} alt="HMoni Society Logo" />
+                <span className="font-bold text-xl ml-2">HMoni Society</span>
             </Link>
 
             <button ref={menubuttonRef} type="button" className="p-link layout-menu-button layout-topbar-button" onClick={onMenuToggle}>

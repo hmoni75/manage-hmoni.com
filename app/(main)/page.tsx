@@ -102,7 +102,7 @@ const Dashboard = () => {
                 <i className="pi pi-clock text-6xl text-yellow-500 mb-3 block" />
                 <h3 className="text-2xl font-bold text-900 mb-2">Account Pending Approval</h3>
                 <p className="text-600 line-height-3 mb-4">
-                    Thank you for signing up with <strong>Nobodhara Aryan Society</strong>. Your registration is currently pending administrator approval. Once an administrator approves your account and sets your role to <strong>Member</strong> or{' '}
+                    Thank you for signing up with <strong>HMoni Society</strong>. Your registration is currently pending administrator approval. Once an administrator approves your account and sets your role to <strong>Member</strong> or{' '}
                     <strong>Admin</strong>, you will gain access to the dashboard and financial ledger.
                 </p>
                 <div className="p-3 bg-yellow-50 border-1 border-yellow-200 border-round text-yellow-900 text-sm font-semibold">Status: Pending Role Assignment by Admin</div>
@@ -116,8 +116,8 @@ const Dashboard = () => {
 
             {/* Header Banner */}
             <div className="surface-card p-4 shadow-2 border-round-xl mb-4 text-center">
-                <h2 className="text-3xl font-bold text-900 mb-1">Nobodhara Aryan Society</h2>
-                <p className="text-600 font-medium m-0">Aryan City, Bongaon, Savar, Dhaka</p>
+                <h2 className="text-3xl font-bold text-900 mb-1">HMoni Society</h2>
+                <p className="text-600 font-medium m-0">HMoni City, Bongaon, Savar, Dhaka</p>
                 <div className="text-primary font-bold text-xl mt-2">Financial Dashboard & Ledger Overview</div>
             </div>
 

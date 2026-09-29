@@ -99,7 +99,7 @@ const RegisterPage = () => {
             <Toast ref={toast} position="top-right" />
 
             <div className="flex flex-column align-items-center justify-content-center w-full max-w-30rem">
-                <img src="/logo.png" alt="Nobodhara Aryan Society Logo" className="mb-4 w-6rem flex-shrink-0" />
+                <img src="/logo.png" alt="HMoni Society Logo" className="mb-4 w-6rem flex-shrink-0" />
 
                 <div
                     className="w-full"
@@ -112,7 +112,7 @@ const RegisterPage = () => {
                     <div className="surface-card py-7 px-4 sm:px-6 shadow-4" style={{ borderRadius: '26px' }}>
                         <div className="text-center mb-5">
                             <div className="text-900 text-3xl font-bold mb-2">Create Account</div>
-                            <span className="text-600 font-medium">Join Nobodhara Aryan Society</span>
+                            <span className="text-600 font-medium">Join HMoni Society</span>
                         </div>
 
                         <form onSubmit={handleRegister} className="p-fluid">

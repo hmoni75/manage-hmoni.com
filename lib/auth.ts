@@ -1,7 +1,7 @@
 import { SignJWT, jwtVerify } from 'jose';
 
 const JWT_SECRET = new TextEncoder().encode(
-    process.env.JWT_SECRET || 'nobodhara_aryan_society_super_secret_key_2026_x99!'
+    process.env.JWT_SECRET || 'hmoni_society_super_secret_key_2026_x99!'
 );
 
 export interface UserPayload {

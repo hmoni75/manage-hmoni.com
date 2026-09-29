@@ -77,7 +77,7 @@ const LoginPage = () => {
             <Toast ref={toast} position="top-right" />
 
             <div className="flex flex-column align-items-center justify-content-center w-full max-w-30rem">
-                <img src="/logo.png" alt="Nobodhara Aryan Society Logo" className="mb-4 w-6rem flex-shrink-0" />
+                <img src="/logo.png" alt="HMoni Society Logo" className="mb-4 w-6rem flex-shrink-0" />
 
                 <div
                     className="w-full"

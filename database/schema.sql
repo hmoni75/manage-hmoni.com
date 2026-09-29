@@ -1,11 +1,11 @@
 -- ============================================================
--- Nobodhara Aryan Society (নবধারা আরিয়ান সোসাইটি)
+-- HMoni Society (এইচমনি সোসাইটি)
 -- Database Schema for cPanel MySQL / MariaDB (phpMyAdmin)
 -- ============================================================
 
 -- Create Database (Run this in cPanel MySQL Database Wizard or phpMyAdmin if needed)
--- CREATE DATABASE IF NOT EXISTS nobodhara_aryan_db DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
--- USE nobodhara_aryan_db;
+-- CREATE DATABASE IF NOT EXISTS hmoni_db DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+-- USE hmoni_db;
 
 -- 1. Table: Plots / Properties
 CREATE TABLE IF NOT EXISTS `plots` (
@@ -67,6 +67,6 @@ INSERT INTO `plots` (`plot_number`, `block`, `size_katha`, `price_bdt`, `facing`
 ('C-310', 'Block C', 10.00, 14000000.00, 'South', 60, 'sold', 'Large premium commercial / multi-story building block.', 'https://images.unsplash.com/photo-1524813686514-a57563d77965?w=800');
 
 INSERT INTO `notices` (`title`, `content`, `category`, `is_urgent`) VALUES
-('Annual General Meeting (AGM) 2026', 'The Annual General Meeting of Nobodhara Aryan Society will take place at the Society Community Center on 25th September 2026 at 10:00 AM. All members are cordially requested to attend.', 'AGM', 1),
+('Annual General Meeting (AGM) 2026', 'The Annual General Meeting of HMoni Society will take place at the Society Community Center on 25th September 2026 at 10:00 AM. All members are cordially requested to attend.', 'AGM', 1),
 ('Road Widening & Electric Line Installation Update', 'Phase-2 road carpet paving and underground electrification work in Block A & B is currently underway. Completion expected by October 2026.', 'Development', 0),
 ('Plot Registration & Mutation Support Camp', 'A dedicated mutation and plot registration support desk will be open at the main office every Saturday this month.', 'Notice', 0);

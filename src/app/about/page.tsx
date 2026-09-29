@@ -8,9 +8,9 @@ export default function AboutPage() {
             {/* Header */}
             <section className="bg-slate-900 text-white py-16">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
-                    <span className="text-emerald-400 text-xs font-bold uppercase tracking-widest bg-emerald-950 px-3 py-1 rounded-full border border-emerald-800">About Nobodhara Aryan Society</span>
+                    <span className="text-emerald-400 text-xs font-bold uppercase tracking-widest bg-emerald-950 px-3 py-1 rounded-full border border-emerald-800">About HMoni Society</span>
                     <h1 className="text-3xl sm:text-5xl font-extrabold">আমাদের পরিচিতি ও লক্ষ্য</h1>
-                    <p className="max-w-2xl mx-auto text-slate-300 text-sm leading-relaxed">নবধারা আরিয়ান সোসাইটি (Nobodhara Aryan Society) একটি বিশ্বস্ত ও পরিকল্পিত মডেল টাউন আবাসন প্রকল্প।</p>
+                    <p className="max-w-2xl mx-auto text-slate-300 text-sm leading-relaxed">এইচমনি সোসাইটি (HMoni Society) একটি বিশ্বস্ত ও পরিকল্পিত মডেল টাউন আবাসন প্রকল্প।</p>
                 </div>
             </section>
 
@@ -20,7 +20,7 @@ export default function AboutPage() {
                     <div className="space-y-6">
                         <h2 className="text-3xl font-extrabold text-slate-900 leading-tight">নিরাপদ বিনিয়োগ ও আধুনিক নাগরিক জীবনের নিশ্চয়তা</h2>
                         <p className="text-slate-600 text-sm leading-relaxed">
-                            নবধারা আরিয়ান সোসাইটি ঢাকা শহরের সন্নিকটে একটি পরিবেশবান্ধব, সুপরিকল্পিত ও আধুনিক সুবিধা সম্বলিত আবাসন প্রকল্প। আমরা শুধুমাত্র জমি বিক্রি করি না, বরং একটি আদর্শ নাগরিক সমাজ ও পরিবার বান্ধব পরিবেশ নির্মাণে প্রতিশ্রুতিবদ্ধ।
+                            এইচমনি সোসাইটি ঢাকা শহরের সন্নিকটে একটি পরিবেশবান্ধব, সুপরিকল্পিত ও আধুনিক সুবিধা সম্বলিত আবাসন প্রকল্প। আমরা শুধুমাত্র জমি বিক্রি করি না, বরং একটি আদর্শ নাগরিক সমাজ ও পরিবার বান্ধব পরিবেশ নির্মাণে প্রতিশ্রুতিবদ্ধ।
                         </p>
 
                         <div className="space-y-3 pt-2">
@@ -58,10 +58,10 @@ export default function AboutPage() {
                     </div>
 
                     <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-200">
-                        <img src="https://images.unsplash.com/photo-1524813686514-a57563d77965?w=1000" alt="Nobodhara Aryan Society Area" className="w-full h-[420px] object-cover" />
+                        <img src="https://images.unsplash.com/photo-1524813686514-a57563d77965?w=1000" alt="HMoni Society Area" className="w-full h-[420px] object-cover" />
                         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-8">
                             <div className="text-white space-y-1">
-                                <p className="font-bold text-lg">নবধারা আরিয়ান সোসাইটি মাস্টারপ্ল্যান</p>
+                                <p className="font-bold text-lg">এইচমনি সোসাইটি মাস্টারপ্ল্যান</p>
                                 <p className="text-xs text-slate-300">ঢাকা শহরের অতি নিকটে অবস্থিত নিষ্কন্টক প্লটসমূহ</p>
                             </div>
                         </div>

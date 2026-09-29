@@ -7,8 +7,8 @@ interface SimpleLayoutProps {
 }
 
 export const metadata: Metadata = {
-    title: 'Nobodhara Aryan Society',
-    description: 'Nobodhara Aryan Society Portal',
+    title: 'HMoni Society',
+    description: 'HMoni Society Portal',
     icons: {
         icon: '/logo.png'
     }

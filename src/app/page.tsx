@@ -55,7 +55,7 @@ export default async function HomePage() {
           <div className="max-w-3xl space-y-6">
             <div className="inline-flex items-center gap-2 bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wide">
               <Sparkles className="w-4 h-4 text-emerald-400" />
-              <span>নবধারা আরিয়ান সোসাইটি • নিচ্ছিন্ত আবাসনের নাম</span>
+              <span>এইচমনি সোসাইটি • নিচ্ছিন্ত আবাসনের নাম</span>
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight text-white">
@@ -274,7 +274,7 @@ export default async function HomePage() {
             Key Features
           </span>
           <h2 className="text-3xl font-extrabold text-slate-900">
-            নবধারা আরিয়ান সোসাইটির নাগরিক সুবিধাসমূহ
+            এইচমনি সোসাইটির নাগরিক সুবিধাসমূহ
           </h2>
           <p className="text-slate-600 text-sm">
             একটি পূর্ণাঙ্গ ও আধুনিক আবাসন প্রকল্পের সমস্ত নাগরিক সুবিধা আমরা নিশ্চিত করছি।
@@ -331,7 +331,7 @@ export default async function HomePage() {
             আজই বুকিং নিশ্চিত করুন এবং বেছে নিন সেরা লোকেশন
           </h2>
           <p className="max-w-2xl mx-auto text-emerald-100 text-sm leading-relaxed">
-            নবধারা আরিয়ান সোসাইটিতে আপনার সুবিধাজনক প্লটটি বেছে নিতে আমাদের প্রতিনিধি দলের সাথে যোগাযোগ করুন অথবা প্রজেক্ট ফিল্ড ভিজিটের জন্য সময় নির্ধারণ করুন।
+            এইচমনি সোসাইটিতে আপনার সুবিধাজনক প্লটটি বেছে নিতে আমাদের প্রতিনিধি দলের সাথে যোগাযোগ করুন অথবা প্রজেক্ট ফিল্ড ভিজিটের জন্য সময় নির্ধারণ করুন।
           </p>
           <div className="pt-2 flex justify-center gap-4">
             <Link

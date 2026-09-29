@@ -82,7 +82,7 @@ export default function PlotsClient({ initialPlots, isConnectedToDb }: PlotsClie
               Available Listings • রেট চার্ট ও প্লট সূচী
             </span>
             <h1 className="text-3xl font-extrabold text-white mt-1">
-              নবধারা আরিয়ান সোসাইটি প্লট ডিরেক্টরি
+              এইচমনি সোসাইটি প্লট ডিরেক্টরি
             </h1>
           </div>
           <div className="bg-emerald-950/80 border border-emerald-800 text-emerald-300 text-xs px-4 py-2 rounded-xl flex items-center gap-2">

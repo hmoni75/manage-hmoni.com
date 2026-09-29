@@ -128,7 +128,7 @@ export default function AdminDashboardPage() {
             <span className="text-xs text-slate-400">cPanel MySQL Dashboard</span>
           </div>
           <h1 className="text-3xl font-extrabold text-white mt-2">
-            নবধারা আরিয়ান সোসাইটি এডমিন প্যানেল
+            এইচমনি সোসাইটি এডমিন প্যানেল
           </h1>
         </div>
 
@@ -515,7 +515,7 @@ export default function AdminDashboardPage() {
               <h4 className="font-bold text-emerald-800">ধাপ ১: cPanel এ MySQL Database তৈরি</h4>
               <p className="text-xs">
                 ১. cPanel ড্যাশবোর্ডে ঢুকে <strong>MySQL® Database Wizard</strong> অপশনে যান।<br />
-                ২. একটি নতুন ডাটাবেজ তৈরি করুন (যেমন: <code>nobodhara_aryan_db</code>)।<br />
+                ২. একটি নতুন ডাটাবেজ তৈরি করুন (যেমন: <code>hmoni_db</code>)।<br />
                 ৩. ডাটাবেজের ইউজারনেম ও পাসওয়ার্ড তৈরি করুন এবং সকল পারমিশন (ALL PRIVILEGES) সিলেক্ট করুন।
               </p>
             </div>

@@ -15,12 +15,12 @@ export default function Footer() {
                 <Building2 className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="font-bold text-lg text-white leading-tight">Nobodhara Aryan</h3>
+                <h3 className="font-bold text-lg text-white leading-tight">HMoni</h3>
                 <p className="text-xs text-emerald-400 font-medium">Society Project</p>
               </div>
             </div>
             <p className="text-sm text-slate-400 leading-relaxed">
-              নবধারা আরিয়ান সোসাইটি - আপনার এবং আপনার পরিবারের আগামী ভবিষ্যতের জন্য একটি পরিকল্পিত ও সুরক্ষিত আবাসন প্রকল্প। আধুনিক সব নাগরিক সুযোগ-সুবিধা নিয়ে সাজানো।
+              এইচমনি সোসাইটি - আপনার এবং আপনার পরিবারের আগামী ভবিষ্যতের জন্য একটি পরিকল্পিত ও সুরক্ষিত আবাসন প্রকল্প। আধুনিক সব নাগরিক সুযোগ-সুবিধা নিয়ে সাজানো।
             </p>
             <div className="flex items-center gap-2 text-xs text-emerald-400 font-medium pt-2">
               <ShieldCheck className="w-4 h-4" />
@@ -78,7 +78,7 @@ export default function Footer() {
               </div>
               <div className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-                <span>info@nobodharaaryan.com</span>
+                <span>info@hmoni.com</span>
               </div>
             </div>
           </div>
@@ -115,7 +115,7 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 gap-4">
-          <p>© {new Date().getFullYear()} Nobodhara Aryan Society (নবধারা আরিয়ান সোসাইটি). All Rights Reserved.</p>
+          <p>© {new Date().getFullYear()} HMoni Society (এইচমনি সোসাইটি). All Rights Reserved.</p>
           <p className="flex items-center gap-1">
             Built with <span className="text-emerald-400 font-medium">Next.js + Tailwind + cPanel MySQL</span>
           </p>

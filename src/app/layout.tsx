@@ -7,9 +7,9 @@ import Footer from '@/components/Footer';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Nobodhara Aryan Society | নবধারা আরিয়ান সোসাইটি',
-  description: 'পরিকল্পিত ও আধুনিক পরিবেশবান্ধব আবাসন প্রকল্প - নবধারা আরিয়ান সোসাইটি। আপনার স্বপ্নের প্লট বুকিং করুন আজই।',
-  keywords: ['Nobodhara Aryan Society', 'Housing Society Bangladesh', 'Plot Sale Dhaka', 'Real Estate Bangladesh', 'নবধারা আরিয়ান সোসাইটি'],
+  title: 'HMoni Society | এইচমনি সোসাইটি',
+  description: 'পরিকল্পিত ও আধুনিক পরিবেশবান্ধব আবাসন প্রকল্প - এইচমনি সোসাইটি। আপনার স্বপ্নের প্লট বুকিং করুন আজই।',
+  keywords: ['HMoni Society', 'Housing Society Bangladesh', 'Plot Sale Dhaka', 'Real Estate Bangladesh', 'এইচমনি সোসাইটি'],
 };
 
 export default function RootLayout({

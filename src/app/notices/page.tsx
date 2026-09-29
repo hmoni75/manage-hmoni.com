@@ -19,7 +19,7 @@ export default async function NoticesPage() {
               Official Announcements
             </span>
             <h1 className="text-3xl sm:text-4xl font-extrabold text-white mt-2">
-              নবধারা আরিয়ান সোসাইটি নোটিশ বোর্ড
+              এইচমনি সোসাইটি নোটিশ বোর্ড
             </h1>
           </div>
           <div className="text-xs text-slate-400">

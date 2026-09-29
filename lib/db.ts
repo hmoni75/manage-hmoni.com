@@ -4,9 +4,9 @@ import mysql from 'mysql2/promise';
 const pool = mysql.createPool({
     host: process.env.DB_HOST || '51.79.229.154',
     port: Number(process.env.DB_PORT) || 3306,
-    user: process.env.DB_USER || 'ashastd24',
-    password: process.env.DB_PASSWORD || 'T%va(oyL[anE',
-    database: process.env.DB_NAME || 'ashastd24_nobodhara-aryan-society',
+    user: process.env.DB_USER || 'hmoni24',
+    password: process.env.DB_PASSWORD || '15HBF&~AVNqu',
+    database: process.env.DB_NAME || 'hmoni24_db',
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
@@ -130,6 +130,61 @@ export async function initDB() {
         try {
             await pool.query(`ALTER TABLE expenses MODIFY COLUMN expense_date VARCHAR(100)`);
         } catch {}
+
+        // 5. Plots table
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS plots (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                plot_number VARCHAR(50) NOT NULL,
+                block VARCHAR(20) NOT NULL,
+                size_katha DECIMAL(5,2) NOT NULL,
+                price_bdt DECIMAL(12,2) NOT NULL,
+                facing VARCHAR(50) DEFAULT 'North',
+                road_width_ft INT DEFAULT 30,
+                status ENUM('available', 'booked', 'sold') DEFAULT 'available',
+                description TEXT,
+                image_url VARCHAR(255),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        `);
+
+        // 6. Notices table
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS notices (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                title VARCHAR(255) NOT NULL,
+                content TEXT NOT NULL,
+                category VARCHAR(50) DEFAULT 'General',
+                is_urgent TINYINT(1) DEFAULT 0,
+                published_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        `);
+
+        // 7. Inquiries table
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS inquiries (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                applicant_name VARCHAR(100) NOT NULL,
+                phone VARCHAR(20) NOT NULL,
+                email VARCHAR(100),
+                plot_id INT NULL,
+                message TEXT,
+                status ENUM('pending', 'contacted', 'approved', 'rejected') DEFAULT 'pending',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (plot_id) REFERENCES plots(id) ON DELETE SET NULL
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        `);
+
+        // 8. Admin Users table
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS admin_users (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                username VARCHAR(50) NOT NULL UNIQUE,
+                password_hash VARCHAR(255) NOT NULL,
+                role VARCHAR(20) DEFAULT 'admin',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        `);
 
         isInitialized = true;
     } catch (error) {
