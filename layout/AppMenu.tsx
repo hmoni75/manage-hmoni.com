@@ -38,7 +38,8 @@ const AppMenu = () => {
         { label: 'Tech Stack / Tools', icon: 'pi pi-fw pi-wrench', to: '/techstack' },
         { label: 'Blog & Resources', icon: 'pi pi-fw pi-book', to: '/blogs' },
         { label: 'Social Media', icon: 'pi pi-fw pi-share-alt', to: '/socials' },
-        { label: 'Contact Messages', icon: 'pi pi-fw pi-envelope', to: '/contacts' },
+        { label: 'Stats / Happy Customers', icon: 'pi pi-fw pi-chart-bar', to: '/stats' },
+        { label: 'Site Settings', icon: 'pi pi-fw pi-sliders-h', to: '/settings' },
         { label: 'User Management', icon: 'pi pi-fw pi-users', to: '/users' }
     ];
 

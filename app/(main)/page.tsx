@@ -26,7 +26,9 @@ const sections: SectionCard[] = [
     { title: 'Tech Stack', route: '/techstack', icon: 'pi-wrench', color: 'text-pink-600', bg: 'bg-pink-100', api: '/api/techstack', description: 'Frameworks, technologies, and proficiency' },
     { title: 'Blog & Resources', route: '/blogs', icon: 'pi-book', color: 'text-orange-600', bg: 'bg-orange-100', api: '/api/blogs', description: 'Articles, published blogs, and resources' },
     { title: 'Social Media', route: '/socials', icon: 'pi-share-alt', color: 'text-blue-500', bg: 'bg-blue-50', api: '/api/socials', description: 'Social profiles on GitHub, LinkedIn, Facebook' },
-    { title: 'Contact Messages', route: '/contacts', icon: 'pi-envelope', color: 'text-red-600', bg: 'bg-red-100', api: '/api/contacts', description: 'Messages and inquiries sent by visitors' }
+    { title: 'Contact Messages', route: '/contacts', icon: 'pi-envelope', color: 'text-red-600', bg: 'bg-red-100', api: '/api/contacts', description: 'Messages and inquiries sent by visitors' },
+    { title: 'Stats & Counters', route: '/stats', icon: 'pi-chart-bar', color: 'text-emerald-600', bg: 'bg-emerald-100', api: '/api/stats', description: 'Happy clients, completed projects, and counters' },
+    { title: 'Site Settings', route: '/settings', icon: 'pi-sliders-h', color: 'text-slate-600', bg: 'bg-slate-100', api: '/api/settings', description: 'Global brand name, contacts, meta keywords' }
 ];
 
 export default function DashboardPage() {
