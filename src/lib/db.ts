@@ -156,9 +156,9 @@ let pool: mysql.Pool | null = null;
 
 export function getDbPool(): mysql.Pool | null {
   const host = process.env.DB_HOST || '51.79.229.154';
-  const user = process.env.DB_USER || 'hmoni24';
+  const user = process.env.DB_USER || 'hmoni24_hmoni24';
   const password = process.env.DB_PASSWORD || '15HBF&~AVNqu';
-  const database = process.env.DB_NAME || 'hmoni24_db';
+  const database = process.env.DB_NAME || 'hmoni24_hmoni';
 
   if (host && user && database) {
     if (!pool) {

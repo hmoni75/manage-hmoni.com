@@ -1,548 +1,772 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Database, Plus, RefreshCw, Layers, Bell, Inbox, Check, Server, ShieldCheck, FileCode } from 'lucide-react';
-import { Plot, Notice, Inquiry } from '@/lib/db';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import { Plus, Trash2, Edit3, RefreshCw, Layout, Layers, Code, Compass, Star, HelpCircle, Briefcase, BookOpen, Share2, Mail, CheckCircle, Database } from 'lucide-react';
 
-export default function AdminDashboardPage() {
-  const [activeTab, setActiveTab] = useState<'inquiries' | 'plots' | 'notices' | 'cpanel'>('inquiries');
-  
-  const [plots, setPlots] = useState<Plot[]>([]);
-  const [notices, setNotices] = useState<Notice[]>([]);
-  const [inquiries, setInquiries] = useState<Inquiry[]>([]);
-  const [isConnectedToDb, setIsConnectedToDb] = useState(false);
-  const [loading, setLoading] = useState(true);
+type TabType = 'hero' | 'projects' | 'services' | 'process' | 'testimonials' | 'faqs' | 'experiences' | 'techstack' | 'blogs' | 'socials' | 'contacts';
 
-  // New Plot Form state
-  const [newPlotNum, setNewPlotNum] = useState('');
-  const [newBlock, setNewBlock] = useState('Block A');
-  const [newSize, setNewSize] = useState('3.0');
-  const [newPrice, setNewPrice] = useState('4500000');
-  const [newFacing, setNewFacing] = useState('North');
-  const [newRoad, setNewRoad] = useState('30');
-  const [newDesc, setNewDesc] = useState('');
-  const [plotSubmitting, setPlotSubmitting] = useState(false);
+export default function AdminPage() {
+    const [activeTab, setActiveTab] = useState<TabType>('hero');
+    const [loading, setLoading] = useState(true);
 
-  // New Notice Form state
-  const [newNoticeTitle, setNewNoticeTitle] = useState('');
-  const [newNoticeContent, setNewNoticeContent] = useState('');
-  const [newNoticeCat, setNewNoticeCat] = useState('General');
-  const [newNoticeUrgent, setNewNoticeUrgent] = useState(false);
-  const [noticeSubmitting, setNoticeSubmitting] = useState(false);
+    // Section Data States
+    const [heroSlides, setHeroSlides] = useState<any[]>([]);
+    const [projects, setProjects] = useState<any[]>([]);
+    const [services, setServices] = useState<any[]>([]);
+    const [processSteps, setProcessSteps] = useState<any[]>([]);
+    const [testimonials, setTestimonials] = useState<any[]>([]);
+    const [faqs, setFaqs] = useState<any[]>([]);
+    const [experiences, setExperiences] = useState<any[]>([]);
+    const [techStack, setTechStack] = useState<any[]>([]);
+    const [blogs, setBlogs] = useState<any[]>([]);
+    const [socials, setSocials] = useState<any[]>([]);
+    const [contacts, setContacts] = useState<any[]>([]);
 
-  const fetchAllData = async () => {
-    setLoading(true);
-    try {
-      const [plotsRes, noticesRes, inquiriesRes] = await Promise.all([
-        fetch('/api/plots').then((res) => res.json()),
-        fetch('/api/notices').then((res) => res.json()),
-        fetch('/api/inquiries').then((res) => res.json()),
-      ]);
+    // Modal State
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingItem, setEditingItem] = useState<any | null>(null);
+    const [formData, setFormData] = useState<any>({});
 
-      if (plotsRes.plots) setPlots(plotsRes.plots);
-      if (noticesRes.notices) setNotices(noticesRes.notices);
-      if (inquiriesRes.inquiries) setInquiries(inquiriesRes.inquiries);
-      setIsConnectedToDb(plotsRes.isConnectedToDb);
-    } catch (err) {
-      console.error('Error fetching admin data:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const fetchTabContent = async () => {
+        setLoading(true);
+        try {
+            if (activeTab === 'hero') {
+                const res = await fetch('/api/hero');
+                const data = await res.json();
+                if (data.success) setHeroSlides(data.data);
+            } else if (activeTab === 'projects') {
+                const res = await fetch('/api/projects');
+                const data = await res.json();
+                if (data.success) setProjects(data.data);
+            } else if (activeTab === 'services') {
+                const res = await fetch('/api/services');
+                const data = await res.json();
+                if (data.success) setServices(data.data);
+            } else if (activeTab === 'process') {
+                const res = await fetch('/api/process');
+                const data = await res.json();
+                if (data.success) setProcessSteps(data.data);
+            } else if (activeTab === 'testimonials') {
+                const res = await fetch('/api/testimonials');
+                const data = await res.json();
+                if (data.success) setTestimonials(data.data);
+            } else if (activeTab === 'faqs') {
+                const res = await fetch('/api/faqs');
+                const data = await res.json();
+                if (data.success) setFaqs(data.data);
+            } else if (activeTab === 'experiences') {
+                const res = await fetch('/api/experiences');
+                const data = await res.json();
+                if (data.success) setExperiences(data.data);
+            } else if (activeTab === 'techstack') {
+                const res = await fetch('/api/techstack');
+                const data = await res.json();
+                if (data.success) setTechStack(data.data);
+            } else if (activeTab === 'blogs') {
+                const res = await fetch('/api/blogs');
+                const data = await res.json();
+                if (data.success) setBlogs(data.data);
+            } else if (activeTab === 'socials') {
+                const res = await fetch('/api/socials');
+                const data = await res.json();
+                if (data.success) setSocials(data.data);
+            } else if (activeTab === 'contacts') {
+                const res = await fetch('/api/contacts');
+                const data = await res.json();
+                if (data.success) setContacts(data.data);
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  useEffect(() => {
-    fetchAllData();
-  }, []);
+    useEffect(() => {
+        fetchTabContent();
+    }, [activeTab]);
 
-  const handleAddPlot = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newPlotNum || !newPrice) return;
+    const openAddModal = () => {
+        setEditingItem(null);
+        setFormData({});
+        setIsModalOpen(true);
+    };
 
-    setPlotSubmitting(true);
-    try {
-      const res = await fetch('/api/plots', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          plot_number: newPlotNum,
-          block: newBlock,
-          size_katha: Number(newSize),
-          price_bdt: Number(newPrice),
-          facing: newFacing,
-          road_width_ft: Number(newRoad),
-          description: newDesc || `Prime plot in ${newBlock}`,
-        }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setNewPlotNum('');
-        setNewDesc('');
-        fetchAllData();
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setPlotSubmitting(false);
-    }
-  };
+    const openEditModal = (item: any) => {
+        setEditingItem(item);
+        setFormData({ ...item });
+        setIsModalOpen(true);
+    };
 
-  const handleAddNotice = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newNoticeTitle || !newNoticeContent) return;
+    const handleDelete = async (id: number) => {
+        if (!confirm('Are you sure you want to delete this item?')) return;
 
-    setNoticeSubmitting(true);
-    try {
-      const res = await fetch('/api/notices', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: newNoticeTitle,
-          content: newNoticeContent,
-          category: newNoticeCat,
-          is_urgent: newNoticeUrgent,
-        }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setNewNoticeTitle('');
-        setNewNoticeContent('');
-        fetchAllData();
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setNoticeSubmitting(false);
-    }
-  };
+        try {
+            const res = await fetch(`/api/${activeTab}?id=${id}`, { method: 'DELETE' });
+            const data = await res.json();
+            if (data.success) {
+                fetchTabContent();
+            } else {
+                alert(data.error || 'Failed to delete');
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
-  return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
-      
-      {/* Header */}
-      <div className="bg-slate-900 text-white rounded-3xl p-8 lg:p-10 space-y-4 shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="bg-emerald-950 border border-emerald-800 text-emerald-400 text-xs font-bold px-3 py-1 rounded-full uppercase">
-              Management Portal
-            </span>
-            <span className="text-xs text-slate-400">cPanel MySQL Dashboard</span>
-          </div>
-          <h1 className="text-3xl font-extrabold text-white mt-2">
-            এইচমনি সোসাইটি এডমিন প্যানেল
-          </h1>
-        </div>
+    const handleSaveItem = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const method = editingItem ? 'PUT' : 'POST';
+        const payload = editingItem ? { ...formData, id: editingItem.id } : formData;
 
-        <button
-          onClick={fetchAllData}
-          className="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold px-4 py-2.5 rounded-xl flex items-center gap-2 transition"
-        >
-          <RefreshCw className={`w-4 h-4 text-emerald-400 ${loading ? 'animate-spin' : ''}`} />
-          <span>রিফ্রেশ তথ্য</span>
-        </button>
-      </div>
+        try {
+            const res = await fetch(`/api/${activeTab}`, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.success) {
+                setIsModalOpen(false);
+                fetchTabContent();
+            } else {
+                alert(data.error || 'Save failed');
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
-      {/* Database Connection Status Bar */}
-      <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-3">
-        <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isConnectedToDb ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-800'}`}>
-            <Server className="w-5 h-5" />
-          </div>
-          <div>
-            <h4 className="font-bold text-slate-900 text-sm">
-              cPanel MySQL Database Connection: {isConnectedToDb ? 'অনলাইন (Connected)' : 'স্যাম্পল ডাটা মোড (Offline)'}
-            </h4>
-            <p className="text-xs text-slate-500">
-              {isConnectedToDb ? 'সরাসরি cPanel MySQL ডাটাবেজে রিড ও রাইট করা হচ্ছে।' : '`.env.local` ফাইলে cPanel MySQL ক্রেডেনশিয়াল দিলে ডাটাবেজ কানেক্ট হবে।'}
-            </p>
-          </div>
-        </div>
+    return (
+        <div className="min-h-screen flex flex-col bg-slate-100">
+            <Navbar />
 
-        <button
-          onClick={() => setActiveTab('cpanel')}
-          className="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs px-4 py-2 rounded-xl transition border border-emerald-200 flex-shrink-0"
-        >
-          cPanel SQL স্ক্রিপ্ট ডোকস
-        </button>
-      </div>
+            <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+                {/* Header */}
+                <div className="bg-slate-900 text-white p-6 rounded-2xl shadow-md mb-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div>
+                        <div className="flex items-center gap-2">
+                            <Database className="w-6 h-6 text-emerald-400" />
+                            <h1 className="text-2xl font-bold">HMoni Content Management System (CMS)</h1>
+                        </div>
+                        <p className="text-slate-400 text-xs mt-1">Add, Edit, and Manage all website dynamic sections in real time.</p>
+                    </div>
 
-      {/* Admin Tabs Bar */}
-      <div className="flex border-b border-slate-200 space-x-4 overflow-x-auto pb-1">
-        <button
-          onClick={() => setActiveTab('inquiries')}
-          className={`flex items-center gap-2 px-5 py-3 font-bold text-sm border-b-2 transition whitespace-nowrap ${
-            activeTab === 'inquiries'
-              ? 'border-emerald-600 text-emerald-700'
-              : 'border-transparent text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          <Inbox className="w-4 h-4" />
-          <span>আবেদন ও বুকিং ইনকোয়ারি ({inquiries.length})</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('plots')}
-          className={`flex items-center gap-2 px-5 py-3 font-bold text-sm border-b-2 transition whitespace-nowrap ${
-            activeTab === 'plots'
-              ? 'border-emerald-600 text-emerald-700'
-              : 'border-transparent text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          <Layers className="w-4 h-4" />
-          <span>নতুন প্লট যুক্ত ও তালিকা ({plots.length})</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('notices')}
-          className={`flex items-center gap-2 px-5 py-3 font-bold text-sm border-b-2 transition whitespace-nowrap ${
-            activeTab === 'notices'
-              ? 'border-emerald-600 text-emerald-700'
-              : 'border-transparent text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          <Bell className="w-4 h-4" />
-          <span>নোটিশ পোস্ট করুন ({notices.length})</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('cpanel')}
-          className={`flex items-center gap-2 px-5 py-3 font-bold text-sm border-b-2 transition whitespace-nowrap ${
-            activeTab === 'cpanel'
-              ? 'border-emerald-600 text-emerald-700'
-              : 'border-transparent text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          <Database className="w-4 h-4" />
-          <span>cPanel DB গাইড (phpMyAdmin)</span>
-        </button>
-      </div>
-
-      {/* TAB 1: Inquiries List */}
-      {activeTab === 'inquiries' && (
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
-          <h3 className="text-xl font-extrabold text-slate-900">
-            গ্রাহকদের বুকিং ও যোগাযোগের তালিকা
-          </h3>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm border-collapse">
-              <thead>
-                <tr className="bg-slate-50 text-slate-700 border-b border-slate-200">
-                  <th className="p-3 font-bold">আইডি</th>
-                  <th className="p-3 font-bold">আবেদনকারীর নাম</th>
-                  <th className="p-3 font-bold">মোবাইল</th>
-                  <th className="p-3 font-bold">ইমেইল</th>
-                  <th className="p-3 font-bold">প্লট আইডি</th>
-                  <th className="p-3 font-bold">বার্তা / নোট</th>
-                  <th className="p-3 font-bold">স্ট্যাটাস</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {inquiries.map((inq) => (
-                  <tr key={inq.id} className="hover:bg-slate-50">
-                    <td className="p-3 font-bold text-slate-500">#{inq.id}</td>
-                    <td className="p-3 font-bold text-slate-900">{inq.applicant_name}</td>
-                    <td className="p-3 text-emerald-700 font-semibold">{inq.phone}</td>
-                    <td className="p-3 text-slate-600">{inq.email || '-'}</td>
-                    <td className="p-3 font-semibold text-slate-800">
-                      {inq.plot_id ? `Plot ID: ${inq.plot_id}` : 'General Inquiry'}
-                    </td>
-                    <td className="p-3 text-xs text-slate-600 max-w-xs">{inq.message || '-'}</td>
-                    <td className="p-3">
-                      <span className="bg-amber-100 text-amber-800 font-bold text-[11px] px-2.5 py-1 rounded">
-                        {inq.status || 'Pending'}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {/* TAB 2: Add & Manage Plots */}
-      {activeTab === 'plots' && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
-          {/* Add Plot Form */}
-          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-            <h3 className="text-xl font-extrabold text-slate-900 border-b border-slate-100 pb-3">
-              নতুন প্লট ইনপুট দিন
-            </h3>
-
-            <form onSubmit={handleAddPlot} className="space-y-3">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">প্লট নম্বর *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. A-108"
-                  value={newPlotNum}
-                  onChange={(e) => setNewPlotNum(e.target.value)}
-                  className="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">ব্লক</label>
-                  <select
-                    value={newBlock}
-                    onChange={(e) => setNewBlock(e.target.value)}
-                    className="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm"
-                  >
-                    <option value="Block A">Block A</option>
-                    <option value="Block B">Block B</option>
-                    <option value="Block C">Block C</option>
-                  </select>
+                    <div className="flex items-center space-x-3">
+                        <button onClick={fetchTabContent} className="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
+                            <RefreshCw className="w-3.5 h-3.5" /> Refresh Data
+                        </button>
+                        {activeTab !== 'contacts' && (
+                            <button onClick={openAddModal} className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow transition">
+                                <Plus className="w-4 h-4" /> Add New Item
+                            </button>
+                        )}
+                    </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">সাইজ (কাঠা)</label>
-                  <input
-                    type="number"
-                    step="0.5"
-                    value={newSize}
-                    onChange={(e) => setNewSize(e.target.value)}
-                    className="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">মোট দাম (BDT) *</label>
-                <input
-                  type="number"
-                  required
-                  value={newPrice}
-                  onChange={(e) => setNewPrice(e.target.value)}
-                  className="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">দিক (Facing)</label>
-                  <input
-                    type="text"
-                    value={newFacing}
-                    onChange={(e) => setNewFacing(e.target.value)}
-                    className="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm"
-                  />
+                {/* Tab Navigation */}
+                <div className="flex overflow-x-auto space-x-2 bg-white p-2 rounded-2xl shadow-sm border border-slate-200 mb-8 scrollbar-none">
+                    {[
+                        { id: 'hero', label: 'Hero Carousel', icon: Layout },
+                        { id: 'projects', label: 'Projects', icon: Layers },
+                        { id: 'services', label: 'Services', icon: Code },
+                        { id: 'process', label: 'Process', icon: Compass },
+                        { id: 'experiences', label: 'Experience', icon: Briefcase },
+                        { id: 'techstack', label: 'Tech Stack', icon: Layers },
+                        { id: 'testimonials', label: 'Testimonials', icon: Star },
+                        { id: 'faqs', label: 'FAQ', icon: HelpCircle },
+                        { id: 'blogs', label: 'Blog & Resources', icon: BookOpen },
+                        { id: 'socials', label: 'Social Links', icon: Share2 },
+                        { id: 'contacts', label: 'Contact Messages', icon: Mail }
+                    ].map((tab) => {
+                        const Icon = tab.icon;
+                        const isActive = activeTab === tab.id;
+                        return (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id as TabType)}
+                                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs whitespace-nowrap transition-all ${
+                                    isActive ? 'bg-emerald-700 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                                }`}
+                            >
+                                <Icon className="w-4 h-4" />
+                                <span>{tab.label}</span>
+                            </button>
+                        );
+                    })}
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">রাস্তা (ft)</label>
-                  <input
-                    type="number"
-                    value={newRoad}
-                    onChange={(e) => setNewRoad(e.target.value)}
-                    className="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm"
-                  />
+                {/* Tab Content Display */}
+                <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200">
+                    {loading ? (
+                        <div className="py-12 text-center text-slate-500 flex justify-center items-center gap-2">
+                            <RefreshCw className="w-5 h-5 animate-spin text-emerald-600" />
+                            <span>Loading {activeTab} data...</span>
+                        </div>
+                    ) : (
+                        <div>
+                            {/* 1. HERO SLIDES */}
+                            {activeTab === 'hero' && (
+                                <div className="space-y-4">
+                                    <h2 className="font-bold text-lg text-slate-900 mb-4">Hero Carousel Slides ({heroSlides.length})</h2>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        {heroSlides.map((slide) => (
+                                            <div key={slide.id} className="border border-slate-200 rounded-xl overflow-hidden bg-slate-50 flex flex-col justify-between">
+                                                <img src={slide.image_url} alt={slide.title} className="w-full h-40 object-cover" />
+                                                <div className="p-4">
+                                                    <h3 className="font-bold text-slate-900">{slide.title}</h3>
+                                                    <p className="text-slate-600 text-xs mt-1">{slide.subtitle}</p>
+                                                    <div className="mt-4 flex justify-between items-center border-t border-slate-200 pt-3">
+                                                        <span className="text-[11px] bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-mono">Btn: {slide.button_text}</span>
+                                                        <div className="flex space-x-2">
+                                                            <button onClick={() => openEditModal(slide)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded">
+                                                                <Edit3 className="w-4 h-4" />
+                                                            </button>
+                                                            <button onClick={() => handleDelete(slide.id)} className="p-1.5 text-red-600 hover:bg-red-50 rounded">
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* 2. PROJECTS */}
+                            {activeTab === 'projects' && (
+                                <div className="space-y-4">
+                                    <h2 className="font-bold text-lg text-slate-900 mb-4">Projects & Portfolio ({projects.length})</h2>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        {projects.map((p) => (
+                                            <div key={p.id} className="border border-slate-200 rounded-xl overflow-hidden bg-slate-50 flex flex-col justify-between">
+                                                <img src={p.image_url} alt={p.title} className="w-full h-36 object-cover" />
+                                                <div className="p-4">
+                                                    <div className="flex justify-between items-center mb-1">
+                                                        <span className="text-[10px] font-bold uppercase text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">{p.category}</span>
+                                                        {p.is_highlighted ? <span className="text-[10px] bg-amber-500 text-white px-2 py-0.5 rounded font-bold">★ Highlighted</span> : null}
+                                                    </div>
+                                                    <h3 className="font-bold text-slate-900 mt-2">{p.title}</h3>
+                                                    <p className="text-slate-600 text-xs mt-1 line-clamp-2">{p.description}</p>
+                                                    <div className="mt-4 flex justify-between items-center border-t border-slate-200 pt-3">
+                                                        <a href={p.project_url} target="_blank" className="text-xs text-emerald-700 hover:underline">
+                                                            Link
+                                                        </a>
+                                                        <div className="flex space-x-2">
+                                                            <button onClick={() => openEditModal(p)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded">
+                                                                <Edit3 className="w-4 h-4" />
+                                                            </button>
+                                                            <button onClick={() => handleDelete(p.id)} className="p-1.5 text-red-600 hover:bg-red-50 rounded">
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* 3. SERVICES */}
+                            {activeTab === 'services' && (
+                                <div className="space-y-4">
+                                    <h2 className="font-bold text-lg text-slate-900 mb-4">Services ({services.length})</h2>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        {services.map((s) => (
+                                            <div key={s.id} className="border border-slate-200 p-5 rounded-xl bg-slate-50 flex flex-col justify-between">
+                                                <div>
+                                                    <div className="font-bold text-xs text-emerald-700 uppercase mb-1">{s.icon}</div>
+                                                    <h3 className="font-bold text-slate-900 text-lg">{s.title}</h3>
+                                                    <p className="text-slate-600 text-xs mt-2">{s.short_description}</p>
+                                                </div>
+                                                <div className="mt-4 flex justify-between items-center border-t border-slate-200 pt-3">
+                                                    <span className="text-xs font-bold text-slate-700">{s.price_starting || 'N/A'}</span>
+                                                    <div className="flex space-x-2">
+                                                        <button onClick={() => openEditModal(s)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded">
+                                                            <Edit3 className="w-4 h-4" />
+                                                        </button>
+                                                        <button onClick={() => handleDelete(s.id)} className="p-1.5 text-red-600 hover:bg-red-50 rounded">
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* 4. PROCESS */}
+                            {activeTab === 'process' && (
+                                <div className="space-y-4">
+                                    <h2 className="font-bold text-lg text-slate-900 mb-4">Process Philosophy ({processSteps.length})</h2>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        {processSteps.map((ps) => (
+                                            <div key={ps.id} className="border border-slate-200 p-5 rounded-xl bg-slate-50 flex justify-between items-center">
+                                                <div>
+                                                    <span className="text-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">Step 0{ps.step_number}</span>
+                                                    <h3 className="font-bold text-slate-900 text-base mt-2">{ps.title}</h3>
+                                                    <p className="text-slate-600 text-xs mt-1">{ps.description}</p>
+                                                </div>
+                                                <div className="flex space-x-2 shrink-0 ml-4">
+                                                    <button onClick={() => openEditModal(ps)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded">
+                                                        <Edit3 className="w-4 h-4" />
+                                                    </button>
+                                                    <button onClick={() => handleDelete(ps.id)} className="p-1.5 text-red-600 hover:bg-red-50 rounded">
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* 5. EXPERIENCES */}
+                            {activeTab === 'experiences' && (
+                                <div className="space-y-4">
+                                    <h2 className="font-bold text-lg text-slate-900 mb-4">Work Experiences ({experiences.length})</h2>
+                                    <div className="space-y-3">
+                                        {experiences.map((exp) => (
+                                            <div key={exp.id} className="border border-slate-200 p-4 rounded-xl bg-slate-50 flex justify-between items-center">
+                                                <div>
+                                                    <h3 className="font-bold text-slate-900">
+                                                        {exp.designation} <span className="text-emerald-700 font-normal">at {exp.company_name}</span>
+                                                    </h3>
+                                                    <p className="text-slate-500 text-xs">
+                                                        {exp.duration} • {exp.location}
+                                                    </p>
+                                                    <p className="text-slate-600 text-xs mt-1">{exp.description}</p>
+                                                </div>
+                                                <div className="flex space-x-2 shrink-0">
+                                                    <button onClick={() => openEditModal(exp)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded">
+                                                        <Edit3 className="w-4 h-4" />
+                                                    </button>
+                                                    <button onClick={() => handleDelete(exp.id)} className="p-1.5 text-red-600 hover:bg-red-50 rounded">
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* 6. TECH STACK */}
+                            {activeTab === 'techstack' && (
+                                <div className="space-y-4">
+                                    <h2 className="font-bold text-lg text-slate-900 mb-4">Tech Stack & Tools ({techStack.length})</h2>
+                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                        {techStack.map((t) => (
+                                            <div key={t.id} className="border border-slate-200 p-4 rounded-xl bg-slate-50 flex justify-between items-center">
+                                                <div>
+                                                    <h3 className="font-bold text-slate-900 text-sm">{t.name}</h3>
+                                                    <span className="text-[10px] text-slate-500 block">{t.category}</span>
+                                                </div>
+                                                <div className="flex space-x-1">
+                                                    <button onClick={() => openEditModal(t)} className="p-1 text-blue-600 hover:bg-blue-50 rounded">
+                                                        <Edit3 className="w-3.5 h-3.5" />
+                                                    </button>
+                                                    <button onClick={() => handleDelete(t.id)} className="p-1 text-red-600 hover:bg-red-50 rounded">
+                                                        <Trash2 className="w-3.5 h-3.5" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* 7. TESTIMONIALS */}
+                            {activeTab === 'testimonials' && (
+                                <div className="space-y-4">
+                                    <h2 className="font-bold text-lg text-slate-900 mb-4">Client Testimonials ({testimonials.length})</h2>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        {testimonials.map((t) => (
+                                            <div key={t.id} className="border border-slate-200 p-5 rounded-xl bg-slate-50 flex flex-col justify-between">
+                                                <p className="text-slate-700 text-xs italic">&quot;{t.comment}&quot;</p>
+                                                <div className="mt-4 flex justify-between items-center border-t border-slate-200 pt-3">
+                                                    <div>
+                                                        <h4 className="font-bold text-slate-900 text-sm">{t.client_name}</h4>
+                                                        <span className="text-[10px] text-slate-500">
+                                                            {t.designation} {t.company && `at ${t.company}`}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex space-x-2">
+                                                        <button onClick={() => openEditModal(t)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded">
+                                                            <Edit3 className="w-4 h-4" />
+                                                        </button>
+                                                        <button onClick={() => handleDelete(t.id)} className="p-1.5 text-red-600 hover:bg-red-50 rounded">
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* 8. FAQS */}
+                            {activeTab === 'faqs' && (
+                                <div className="space-y-4">
+                                    <h2 className="font-bold text-lg text-slate-900 mb-4">FAQs ({faqs.length})</h2>
+                                    <div className="space-y-3">
+                                        {faqs.map((f) => (
+                                            <div key={f.id} className="border border-slate-200 p-4 rounded-xl bg-slate-50 flex justify-between items-start">
+                                                <div>
+                                                    <h3 className="font-bold text-slate-900 text-sm">Q: {f.question}</h3>
+                                                    <p className="text-slate-600 text-xs mt-1">A: {f.answer}</p>
+                                                </div>
+                                                <div className="flex space-x-2 shrink-0 ml-4">
+                                                    <button onClick={() => openEditModal(f)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded">
+                                                        <Edit3 className="w-4 h-4" />
+                                                    </button>
+                                                    <button onClick={() => handleDelete(f.id)} className="p-1.5 text-red-600 hover:bg-red-50 rounded">
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* 9. BLOGS */}
+                            {activeTab === 'blogs' && (
+                                <div className="space-y-4">
+                                    <h2 className="font-bold text-lg text-slate-900 mb-4">Blog Articles & Resources ({blogs.length})</h2>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        {blogs.map((b) => (
+                                            <div key={b.id} className="border border-slate-200 rounded-xl overflow-hidden bg-slate-50 flex flex-col justify-between">
+                                                {b.cover_image && <img src={b.cover_image} alt={b.title} className="w-full h-36 object-cover" />}
+                                                <div className="p-4">
+                                                    <h3 className="font-bold text-slate-900">{b.title}</h3>
+                                                    <p className="text-slate-600 text-xs mt-1 line-clamp-2">{b.excerpt}</p>
+                                                    <div className="mt-4 flex justify-between items-center border-t border-slate-200 pt-3">
+                                                        <span className="text-[10px] text-slate-500">{b.read_time}</span>
+                                                        <div className="flex space-x-2">
+                                                            <button onClick={() => openEditModal(b)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded">
+                                                                <Edit3 className="w-4 h-4" />
+                                                            </button>
+                                                            <button onClick={() => handleDelete(b.id)} className="p-1.5 text-red-600 hover:bg-red-50 rounded">
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* 10. SOCIALS */}
+                            {activeTab === 'socials' && (
+                                <div className="space-y-4">
+                                    <h2 className="font-bold text-lg text-slate-900 mb-4">Social Media Links ({socials.length})</h2>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {socials.map((s) => (
+                                            <div key={s.id} className="border border-slate-200 p-4 rounded-xl bg-slate-50 flex justify-between items-center">
+                                                <div>
+                                                    <h3 className="font-bold text-slate-900 text-sm">{s.platform}</h3>
+                                                    <a href={s.url} target="_blank" className="text-xs text-emerald-700 hover:underline">
+                                                        {s.url}
+                                                    </a>
+                                                </div>
+                                                <div className="flex space-x-2">
+                                                    <button onClick={() => openEditModal(s)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded">
+                                                        <Edit3 className="w-4 h-4" />
+                                                    </button>
+                                                    <button onClick={() => handleDelete(s.id)} className="p-1.5 text-red-600 hover:bg-red-50 rounded">
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* 11. CONTACTS */}
+                            {activeTab === 'contacts' && (
+                                <div className="space-y-4">
+                                    <h2 className="font-bold text-lg text-slate-900 mb-4">Contact Form Submissions ({contacts.length})</h2>
+                                    <div className="space-y-3">
+                                        {contacts.map((c) => (
+                                            <div key={c.id} className="border border-slate-200 p-5 rounded-xl bg-slate-50 flex justify-between items-start">
+                                                <div>
+                                                    <div className="flex items-center gap-2">
+                                                        <h3 className="font-bold text-slate-900">{c.name}</h3>
+                                                        <span className="text-xs text-slate-500">({c.email})</span>
+                                                        {c.phone && <span className="text-xs bg-slate-200 px-2 py-0.5 rounded text-slate-700">{c.phone}</span>}
+                                                    </div>
+                                                    <h4 className="font-semibold text-emerald-800 text-xs mt-1">Subject: {c.subject}</h4>
+                                                    <p className="text-slate-700 text-sm mt-2 whitespace-pre-line">{c.message}</p>
+                                                    <span className="text-[10px] text-slate-400 block mt-2">{new Date(c.created_at).toLocaleString()}</span>
+                                                </div>
+                                                <button onClick={() => handleDelete(c.id)} className="p-1.5 text-red-600 hover:bg-red-50 rounded shrink-0 ml-4">
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">বিবরণ</label>
-                <textarea
-                  rows={2}
-                  placeholder="প্লট এর সুবিধা লিখুন..."
-                  value={newDesc}
-                  onChange={(e) => setNewDesc(e.target.value)}
-                  className="w-full border border-slate-300 rounded-xl p-2 text-sm"
-                />
-              </div>
+                {/* Dynamic Modal for Adding / Editing Items */}
+                {isModalOpen && (
+                    <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
+                        <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200">
+                            <h3 className="text-xl font-bold text-slate-900 mb-6">{editingItem ? `Edit ${activeTab} item` : `Add new ${activeTab} item`}</h3>
 
-              <button
-                type="submit"
-                disabled={plotSubmitting}
-                className="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-2.5 rounded-xl transition text-sm flex items-center justify-center gap-1"
-              >
-                <Plus className="w-4 h-4" />
-                <span>{plotSubmitting ? 'সেভ হচ্ছে...' : 'প্লট যুক্ত করুন (cPanel DB)'}</span>
-              </button>
-            </form>
-          </div>
+                            <form onSubmit={handleSaveItem} className="space-y-4">
+                                {/* Hero Slide Form */}
+                                {activeTab === 'hero' && (
+                                    <>
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase mb-1">Title *</label>
+                                            <input type="text" required value={formData.title || ''} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase mb-1">Subtitle</label>
+                                            <textarea value={formData.subtitle || ''} onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase mb-1">Image URL *</label>
+                                            <input type="text" required value={formData.image_url || ''} onChange={(e) => setFormData({ ...formData, image_url: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-xs font-bold uppercase mb-1">Button Text</label>
+                                                <input type="text" value={formData.button_text || ''} onChange={(e) => setFormData({ ...formData, button_text: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs font-bold uppercase mb-1">Button Link</label>
+                                                <input type="text" value={formData.button_link || ''} onChange={(e) => setFormData({ ...formData, button_link: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
 
-          {/* Plot List Table */}
-          <div className="lg:col-span-2 bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-            <h3 className="text-xl font-extrabold text-slate-900">
-              বর্তমান প্লটের তালিকা
-            </h3>
+                                {/* Projects Form */}
+                                {activeTab === 'projects' && (
+                                    <>
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase mb-1">Project Title *</label>
+                                            <input type="text" required value={formData.title || ''} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase mb-1">Category</label>
+                                            <input type="text" value={formData.category || ''} onChange={(e) => setFormData({ ...formData, category: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase mb-1">Description *</label>
+                                            <textarea required value={formData.description || ''} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase mb-1">Image URL *</label>
+                                            <input type="text" required value={formData.image_url || ''} onChange={(e) => setFormData({ ...formData, image_url: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase mb-1">Project URL</label>
+                                            <input type="text" value={formData.project_url || ''} onChange={(e) => setFormData({ ...formData, project_url: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <input type="checkbox" id="is_highlighted" checked={Boolean(formData.is_highlighted)} onChange={(e) => setFormData({ ...formData, is_highlighted: e.target.checked })} />
+                                            <label htmlFor="is_highlighted" className="text-xs font-bold uppercase">
+                                                Highlight on Home Page
+                                            </label>
+                                        </div>
+                                    </>
+                                )}
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm border-collapse">
-                <thead>
-                  <tr className="bg-slate-50 border-b border-slate-200">
-                    <th className="p-3 font-bold">নম্বর</th>
-                    <th className="p-3 font-bold">ব্লক</th>
-                    <th className="p-3 font-bold">সাইজ</th>
-                    <th className="p-3 font-bold">মূল্য</th>
-                    <th className="p-3 font-bold">স্ট্যাটাস</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {plots.map((p) => (
-                    <tr key={p.id}>
-                      <td className="p-3 font-bold text-slate-900">{p.plot_number}</td>
-                      <td className="p-3 text-slate-600">{p.block}</td>
-                      <td className="p-3 font-semibold">{p.size_katha} কাঠা</td>
-                      <td className="p-3 text-emerald-700 font-bold">৳ {p.price_bdt.toLocaleString('bn-BD')}</td>
-                      <td className="p-3">
-                        <span className="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2 py-0.5 rounded">
-                          {p.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+                                {/* Services Form */}
+                                {activeTab === 'services' && (
+                                    <>
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase mb-1">Service Title *</label>
+                                            <input type="text" required value={formData.title || ''} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase mb-1">Icon (Code, Server, Layout, Globe)</label>
+                                            <input type="text" value={formData.icon || ''} onChange={(e) => setFormData({ ...formData, icon: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase mb-1">Short Description *</label>
+                                            <textarea required value={formData.short_description || ''} onChange={(e) => setFormData({ ...formData, short_description: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase mb-1">Starting Price</label>
+                                            <input type="text" value={formData.price_starting || ''} onChange={(e) => setFormData({ ...formData, price_starting: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                        </div>
+                                    </>
+                                )}
 
+                                {/* Process Form */}
+                                {activeTab === 'process' && (
+                                    <>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-xs font-bold uppercase mb-1">Step Number *</label>
+                                                <input type="number" required value={formData.step_number || 1} onChange={(e) => setFormData({ ...formData, step_number: Number(e.target.value) })} className="w-full p-2.5 border rounded-xl" />
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs font-bold uppercase mb-1">Icon Name</label>
+                                                <input type="text" value={formData.icon || ''} onChange={(e) => setFormData({ ...formData, icon: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase mb-1">Title *</label>
+                                            <input type="text" required value={formData.title || ''} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase mb-1">Description *</label>
+                                            <textarea required value={formData.description || ''} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                        </div>
+                                    </>
+                                )}
+
+                                {/* Experience Form */}
+                                {activeTab === 'experiences' && (
+                                    <>
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase mb-1">Designation *</label>
+                                            <input type="text" required value={formData.designation || ''} onChange={(e) => setFormData({ ...formData, designation: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase mb-1">Company Name *</label>
+                                            <input type="text" required value={formData.company_name || ''} onChange={(e) => setFormData({ ...formData, company_name: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase mb-1">Duration *</label>
+                                            <input type="text" required value={formData.duration || ''} onChange={(e) => setFormData({ ...formData, duration: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase mb-1">Description</label>
+                                            <textarea value={formData.description || ''} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                        </div>
+                                    </>
+                                )}
+
+                                {/* Tech Stack Form */}
+                                {activeTab === 'techstack' && (
+                                    <>
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase mb-1">Tool Name *</label>
+                                            <input type="text" required value={formData.name || ''} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase mb-1">Category</label>
+                                            <input type="text" value={formData.category || ''} onChange={(e) => setFormData({ ...formData, category: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase mb-1">Icon URL</label>
+                                            <input type="text" value={formData.icon_url || ''} onChange={(e) => setFormData({ ...formData, icon_url: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                        </div>
+                                    </>
+                                )}
+
+                                {/* Testimonials Form */}
+                                {activeTab === 'testimonials' && (
+                                    <>
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase mb-1">Client Name *</label>
+                                            <input type="text" required value={formData.client_name || ''} onChange={(e) => setFormData({ ...formData, client_name: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-xs font-bold uppercase mb-1">Designation</label>
+                                                <input type="text" value={formData.designation || ''} onChange={(e) => setFormData({ ...formData, designation: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs font-bold uppercase mb-1">Company</label>
+                                                <input type="text" value={formData.company || ''} onChange={(e) => setFormData({ ...formData, company: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase mb-1">Comment *</label>
+                                            <textarea required value={formData.comment || ''} onChange={(e) => setFormData({ ...formData, comment: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase mb-1">Avatar Image URL</label>
+                                            <input type="text" value={formData.avatar_url || ''} onChange={(e) => setFormData({ ...formData, avatar_url: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                        </div>
+                                    </>
+                                )}
+
+                                {/* FAQ Form */}
+                                {activeTab === 'faqs' && (
+                                    <>
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase mb-1">Question *</label>
+                                            <input type="text" required value={formData.question || ''} onChange={(e) => setFormData({ ...formData, question: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase mb-1">Answer *</label>
+                                            <textarea required value={formData.answer || ''} onChange={(e) => setFormData({ ...formData, answer: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                        </div>
+                                    </>
+                                )}
+
+                                {/* Blog Form */}
+                                {activeTab === 'blogs' && (
+                                    <>
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase mb-1">Title *</label>
+                                            <input type="text" required value={formData.title || ''} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase mb-1">Excerpt *</label>
+                                            <textarea required value={formData.excerpt || ''} onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase mb-1">Full Content *</label>
+                                            <textarea rows={6} required value={formData.content || ''} onChange={(e) => setFormData({ ...formData, content: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase mb-1">Cover Image URL</label>
+                                            <input type="text" value={formData.cover_image || ''} onChange={(e) => setFormData({ ...formData, cover_image: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                        </div>
+                                    </>
+                                )}
+
+                                {/* Social Links Form */}
+                                {activeTab === 'socials' && (
+                                    <>
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase mb-1">Platform Name (Facebook, LinkedIn, GitHub, Twitter) *</label>
+                                            <input type="text" required value={formData.platform || ''} onChange={(e) => setFormData({ ...formData, platform: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-bold uppercase mb-1">URL *</label>
+                                            <input type="text" required value={formData.url || ''} onChange={(e) => setFormData({ ...formData, url: e.target.value })} className="w-full p-2.5 border rounded-xl" />
+                                        </div>
+                                    </>
+                                )}
+
+                                <div className="flex justify-end space-x-3 pt-6 border-t border-slate-200">
+                                    <button type="button" onClick={() => setIsModalOpen(false)} className="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold text-xs">
+                                        Cancel
+                                    </button>
+                                    <button type="submit" className="px-5 py-2.5 rounded-xl bg-emerald-700 text-white font-bold text-xs hover:bg-emerald-800 shadow">
+                                        Save Changes
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                )}
+            </main>
+
+            <Footer />
         </div>
-      )}
-
-      {/* TAB 3: Post Notices */}
-      {activeTab === 'notices' && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
-          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-            <h3 className="text-xl font-extrabold text-slate-900 border-b border-slate-100 pb-3">
-              নতুন নোটিশ প্রকাশ করুন
-            </h3>
-
-            <form onSubmit={handleAddNotice} className="space-y-3">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">নোটিশের শিরোনাম *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. এজিএম সংক্রান্ত জরুরি নোটিশ"
-                  value={newNoticeTitle}
-                  onChange={(e) => setNewNoticeTitle(e.target.value)}
-                  className="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">ক্যাটাগরি</label>
-                <select
-                  value={newNoticeCat}
-                  onChange={(e) => setNewNoticeCat(e.target.value)}
-                  className="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm"
-                >
-                  <option value="General">General</option>
-                  <option value="AGM">AGM</option>
-                  <option value="Development">Development</option>
-                  <option value="Notice">Notice</option>
-                </select>
-              </div>
-
-              <div className="flex items-center gap-2 pt-1">
-                <input
-                  type="checkbox"
-                  id="urgentCheck"
-                  checked={newNoticeUrgent}
-                  onChange={(e) => setNewNoticeUrgent(e.target.checked)}
-                  className="rounded text-emerald-600 focus:ring-emerald-500"
-                />
-                <label htmlFor="urgentCheck" className="text-xs font-bold text-slate-800">
-                  জরুরি (Urgent Notice mark)
-                </label>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">নোটিশের বিস্তারিত *</label>
-                <textarea
-                  rows={4}
-                  required
-                  placeholder="বিস্তারিত বিষয়াবলি..."
-                  value={newNoticeContent}
-                  onChange={(e) => setNewNoticeContent(e.target.value)}
-                  className="w-full border border-slate-300 rounded-xl p-3 text-sm"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={noticeSubmitting}
-                className="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-2.5 rounded-xl transition text-sm flex items-center justify-center gap-1"
-              >
-                <Plus className="w-4 h-4" />
-                <span>{noticeSubmitting ? 'প্রকাশ হচ্ছে...' : 'নোটিশ প্রকাশ করুন (cPanel DB)'}</span>
-              </button>
-            </form>
-          </div>
-
-          <div className="lg:col-span-2 bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-            <h3 className="text-xl font-extrabold text-slate-900">
-              প্রকাশিত নোটিশসমূহ
-            </h3>
-
-            <div className="space-y-4">
-              {notices.map((n) => (
-                <div key={n.id} className="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-1">
-                  <div className="flex justify-between items-center">
-                    <h4 className="font-bold text-slate-900 text-base">{n.title}</h4>
-                    <span className="bg-slate-200 text-slate-700 text-xs px-2 py-0.5 rounded">
-                      {n.category}
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-600">{n.content}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-        </div>
-      )}
-
-      {/* TAB 4: cPanel DB Guide & SQL */}
-      {activeTab === 'cpanel' && (
-        <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6">
-          <div className="space-y-2 border-b border-slate-100 pb-4">
-            <div className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-800 font-bold text-xs px-3 py-1 rounded-md">
-              <FileCode className="w-4 h-4" /> cPanel Database Setup Documentation
-            </div>
-            <h3 className="text-2xl font-extrabold text-slate-900">
-              cPanel (phpMyAdmin) এ কিভাবে ডাটাবেজ ইন্টিগ্রেশন করবেন?
-            </h3>
-          </div>
-
-          <div className="space-y-4 text-sm text-slate-700">
-            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
-              <h4 className="font-bold text-emerald-800">ধাপ ১: cPanel এ MySQL Database তৈরি</h4>
-              <p className="text-xs">
-                ১. cPanel ড্যাশবোর্ডে ঢুকে <strong>MySQL® Database Wizard</strong> অপশনে যান।<br />
-                ২. একটি নতুন ডাটাবেজ তৈরি করুন (যেমন: <code>hmoni_db</code>)।<br />
-                ৩. ডাটাবেজের ইউজারনেম ও পাসওয়ার্ড তৈরি করুন এবং সকল পারমিশন (ALL PRIVILEGES) সিলেক্ট করুন।
-              </p>
-            </div>
-
-            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
-              <h4 className="font-bold text-emerald-800">ধাপ ২: phpMyAdmin এ schema.sql ইমপোর্ট</h4>
-              <p className="text-xs">
-                ১. cPanel থেকে <strong>phpMyAdmin</strong> ওপেন করুন।<br />
-                ২. নতুন তৈরি করা ডাটাবেজটি ক্লিক করুন এবং উপরে <strong>Import</strong> ট্যাবে যান।<br />
-                ৩. প্রজেক্টের <code>database/schema.sql</code> ফাইলটি সিলেক্ট করে <strong>Go</strong> বাটনে ক্লিক করুন।
-              </p>
-            </div>
-
-            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
-              <h4 className="font-bold text-emerald-800">ধাপ ৩: Next.js `.env.local` কনফিগারেশন</h4>
-              <pre className="bg-slate-900 text-emerald-300 p-4 rounded-xl text-xs overflow-x-auto">
-{`DB_HOST=localhost (অথবা cPanel DB Server IP)
-DB_USER=your_cpanel_db_user
-DB_PASSWORD=your_cpanel_db_password
-DB_NAME=your_cpanel_db_name
-DB_PORT=3306`}
-              </pre>
-            </div>
-          </div>
-        </div>
-      )}
-
-    </div>
-  );
+    );
 }
