@@ -23,34 +23,78 @@ export async function POST(req: Request) {
             title,
             description,
             image_url,
+            img,
             project_url,
+            link,
             github_url,
             tech_used,
             category,
             is_highlighted,
+            featured,
             sort_order,
             location,
             size,
-            service
+            service,
+            client,
+            release_date,
+            role,
+            duration,
+            challenge,
+            solution,
+            key_features,
+            outcome,
+            testimonial_quote,
+            testimonial_author,
+            testimonial_role,
+            detail_image_1,
+            detail_image_2,
+            detail_image_3,
+            detail_image_4
         } = body;
+
+        const mainImg = image_url || img || '';
+        const projectLink = project_url || link || '/portfolio-details-1';
+        const isHigh = is_highlighted !== undefined ? (is_highlighted ? 1 : 0) : (featured ? 1 : 0);
 
         const [result] = await pool.execute<ResultSetHeader>(
             `INSERT INTO projects 
-            (title, description, image_url, project_url, github_url, tech_used, category, is_highlighted, sort_order, location, size, service) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            (title, description, image_url, img, project_url, link, github_url, tech_used, category, 
+             is_highlighted, featured, sort_order, location, size, service,
+             client, release_date, role, duration, challenge, solution, key_features, outcome,
+             testimonial_quote, testimonial_author, testimonial_role,
+             detail_image_1, detail_image_2, detail_image_3, detail_image_4) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 title,
                 description || '',
-                image_url || '',
-                project_url || '',
+                mainImg,
+                mainImg,
+                projectLink,
+                projectLink,
                 github_url || '',
                 tech_used || '',
                 category || 'General',
-                is_highlighted ? 1 : 0,
+                isHigh,
+                isHigh,
                 Number(sort_order) || 0,
                 location || '',
                 size || '',
-                service || ''
+                service || '',
+                client || '',
+                release_date || '',
+                role || '',
+                duration || '',
+                challenge || '',
+                solution || '',
+                key_features || '',
+                outcome || '',
+                testimonial_quote || '',
+                testimonial_author || '',
+                testimonial_role || '',
+                detail_image_1 || '',
+                detail_image_2 || '',
+                detail_image_3 || '',
+                detail_image_4 || ''
             ]
         );
 
@@ -69,37 +113,80 @@ export async function PUT(req: Request) {
             title,
             description,
             image_url,
+            img,
             project_url,
+            link,
             github_url,
             tech_used,
             category,
             is_highlighted,
+            featured,
             sort_order,
             location,
             size,
-            service
+            service,
+            client,
+            release_date,
+            role,
+            duration,
+            challenge,
+            solution,
+            key_features,
+            outcome,
+            testimonial_quote,
+            testimonial_author,
+            testimonial_role,
+            detail_image_1,
+            detail_image_2,
+            detail_image_3,
+            detail_image_4
         } = body;
 
         if (!id) return NextResponse.json({ success: false, error: 'Project ID is required' }, { status: 400 });
 
+        const mainImg = image_url || img || '';
+        const projectLink = project_url || link || '/portfolio-details-1';
+        const isHigh = is_highlighted !== undefined ? (is_highlighted ? 1 : 0) : (featured ? 1 : 0);
+
         await pool.execute(
             `UPDATE projects SET 
-            title = ?, description = ?, image_url = ?, project_url = ?, github_url = ?, 
-            tech_used = ?, category = ?, is_highlighted = ?, sort_order = ?, location = ?, size = ?, service = ? 
+            title = ?, description = ?, image_url = ?, img = ?, project_url = ?, link = ?, github_url = ?, 
+            tech_used = ?, category = ?, is_highlighted = ?, featured = ?, sort_order = ?, location = ?, size = ?, service = ?,
+            client = ?, release_date = ?, role = ?, duration = ?, challenge = ?, solution = ?, key_features = ?, outcome = ?,
+            testimonial_quote = ?, testimonial_author = ?, testimonial_role = ?,
+            detail_image_1 = ?, detail_image_2 = ?, detail_image_3 = ?, detail_image_4 = ?
             WHERE id = ?`,
             [
                 title,
                 description || '',
-                image_url || '',
-                project_url || '',
+                mainImg,
+                mainImg,
+                projectLink,
+                projectLink,
                 github_url || '',
                 tech_used || '',
                 category || 'General',
-                is_highlighted ? 1 : 0,
+                isHigh,
+                isHigh,
                 Number(sort_order) || 0,
                 location || '',
                 size || '',
                 service || '',
+                client || '',
+                release_date || '',
+                role || '',
+                duration || '',
+                challenge || '',
+                solution || '',
+                key_features || '',
+                outcome || '',
+                testimonial_quote || '',
+                testimonial_author || '',
+                testimonial_role || '',
+                detail_image_1 || '',
+                detail_image_2 || '',
+                detail_image_3 || '',
+                detail_image_4 || '',
                 id
             ]
         );
