@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   try {
     await initDB();
-    const [rows] = await pool.execute<RowDataPacket[]>('SELECT * FROM hero_slides WHERE deleted_at IS NULL ORDER BY sort_order ASC, id DESC');
+    const [rows] = await pool.execute<RowDataPacket[]>('SELECT * FROM hero_slides ORDER BY sort_order ASC, id DESC');
     return NextResponse.json({ success: true, data: rows });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
@@ -58,7 +58,7 @@ export async function DELETE(req: Request) {
 
     if (!id) return NextResponse.json({ success: false, error: 'Slide ID is required' }, { status: 400 });
 
-    await pool.execute('UPDATE hero_slides SET is_deleted = 1, isDelete = 1, deleted_at = NOW() WHERE id = ?', [id]);
+    await pool.execute('DELETE FROM hero_slides WHERE id = ?', [id]);
     return NextResponse.json({ success: true, message: 'Hero slide deleted' });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

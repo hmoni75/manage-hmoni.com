@@ -6,7 +6,23 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
     try {
-        const [rows] = await pool.execute<RowDataPacket[]>('SELECT * FROM services WHERE deleted_at IS NULL ORDER BY sort_order ASC, id ASC');
+        const [rows] = await pool.execute<RowDataPacket[]>(`
+            SELECT 
+                id, 
+                title, 
+                COALESCE(description, desc_text, '') as description, 
+                COALESCE(desc_text, description, '') as desc_text, 
+                icon, 
+                sort_order, 
+                num, 
+                tags_json, 
+                delay, 
+                created_at, 
+                updated_at 
+            FROM services 
+            WHERE deleted_at IS NULL 
+            ORDER BY sort_order ASC, id ASC
+        `);
         return NextResponse.json({ success: true, data: rows });
     } catch (error: any) {
         console.error('Services GET error:', error);
@@ -17,11 +33,21 @@ export async function GET() {
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { title, description, icon, sort_order, desc_text, num } = body;
+        const { title, description, icon, sort_order, desc_text, num, tags, tags_json, delay } = body;
+
+        let parsedTagsJson = tags_json;
+        if (!parsedTagsJson && tags !== undefined) {
+            const arr = Array.isArray(tags) ? tags : String(tags).split(',').map((t) => t.trim()).filter(Boolean);
+            parsedTagsJson = JSON.stringify(arr);
+        } else if (Array.isArray(tags_json)) {
+            parsedTagsJson = JSON.stringify(tags_json);
+        }
+
+        const desc = description || desc_text || '';
 
         const [result] = await pool.execute<ResultSetHeader>(
-            'INSERT INTO services (title, description, icon, sort_order, desc_text, num) VALUES (?, ?, ?, ?, ?, ?)',
-            [title, description || desc_text || '', icon || 'pi-code', Number(sort_order) || 0, desc_text || description || '', num || '']
+            'INSERT INTO services (title, description, icon, sort_order, desc_text, num, tags_json, delay) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            [title, desc, icon || 'pi-code', Number(sort_order) || 0, desc, num || '01', parsedTagsJson || '[]', delay || '0.05']
         );
 
         return NextResponse.json({ success: true, id: result.insertId, message: 'Service created' });
@@ -34,13 +60,23 @@ export async function POST(req: Request) {
 export async function PUT(req: Request) {
     try {
         const body = await req.json();
-        const { id, title, description, icon, sort_order, desc_text, num } = body;
+        const { id, title, description, icon, sort_order, desc_text, num, tags, tags_json, delay } = body;
 
         if (!id) return NextResponse.json({ success: false, error: 'Service ID is required' }, { status: 400 });
 
+        let parsedTagsJson = tags_json;
+        if (!parsedTagsJson && tags !== undefined) {
+            const arr = Array.isArray(tags) ? tags : String(tags).split(',').map((t) => t.trim()).filter(Boolean);
+            parsedTagsJson = JSON.stringify(arr);
+        } else if (Array.isArray(tags_json)) {
+            parsedTagsJson = JSON.stringify(tags_json);
+        }
+
+        const desc = description || desc_text || '';
+
         await pool.execute(
-            'UPDATE services SET title = ?, description = ?, icon = ?, sort_order = ?, desc_text = ?, num = ? WHERE id = ?',
-            [title, description || desc_text || '', icon || 'pi-code', Number(sort_order) || 0, desc_text || description || '', num || '', id]
+            'UPDATE services SET title = ?, description = ?, icon = ?, sort_order = ?, desc_text = ?, num = ?, tags_json = ?, delay = ? WHERE id = ?',
+            [title, desc, icon || 'pi-code', Number(sort_order) || 0, desc, num || '01', parsedTagsJson || '[]', delay || '0.05', id]
         );
 
         return NextResponse.json({ success: true, message: 'Service updated' });

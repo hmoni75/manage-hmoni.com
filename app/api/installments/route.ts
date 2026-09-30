@@ -113,7 +113,7 @@ export async function DELETE(request: Request) {
             return NextResponse.json({ error: 'Installment ID is required' }, { status: 400 });
         }
 
-        await pool.execute('UPDATE member_installments SET is_deleted = 1, isDelete = 1, deleted_at = NOW() WHERE id = ?', [id]);
+        await pool.execute('UPDATE member_installments SET deleted_at = NOW() WHERE id = ?', [id]);
 
         return NextResponse.json({ success: true, message: 'Installment deleted successfully' });
     } catch (error: any) {

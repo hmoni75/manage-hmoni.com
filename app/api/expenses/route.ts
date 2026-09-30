@@ -11,7 +11,7 @@ async function checkAdminPermission() {
     const token = cookies().get('auth_token')?.value;
     if (!token) return false;
     const user = await verifyToken(token);
-    return user?.role === 'admin' || user?.role === 'super_admin';
+    return user?.role === 'admin';
 }
 
 async function checkAuthUser() {
@@ -25,7 +25,7 @@ export async function GET() {
         await initDB();
 
         const user = await checkAuthUser();
-        if (!user || (user.role !== 'admin' && user.role !== 'super_admin' && user.role !== 'member')) {
+        if (!user || (user.role !== 'admin' && user.role !== 'member')) {
             return NextResponse.json({ error: 'Access Denied. Approved account required.' }, { status: 403 });
         }
 
@@ -139,7 +139,7 @@ export async function DELETE(request: Request) {
             return NextResponse.json({ error: 'Expense ID is required' }, { status: 400 });
         }
 
-        await pool.execute('UPDATE expenses SET is_deleted = 1, isDelete = 1, deleted_at = NOW() WHERE id = ?', [id]);
+        await pool.execute('UPDATE expenses SET deleted_at = NOW() WHERE id = ?', [id]);
 
         return NextResponse.json({ success: true, message: 'Expense deleted successfully' });
     } catch (error: any) {

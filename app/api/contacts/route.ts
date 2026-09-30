@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   try {
     await initDB();
-    const [rows] = await pool.execute<RowDataPacket[]>('SELECT * FROM contacts WHERE deleted_at IS NULL ORDER BY created_at DESC');
+    const [rows] = await pool.execute<RowDataPacket[]>('SELECT * FROM contacts ORDER BY created_at DESC');
     return NextResponse.json({ success: true, data: rows });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
@@ -58,7 +58,7 @@ export async function DELETE(req: Request) {
 
     if (!id) return NextResponse.json({ success: false, error: 'ID is required' }, { status: 400 });
 
-    await pool.execute('UPDATE contacts SET is_deleted = 1, isDelete = 1, deleted_at = NOW() WHERE id = ?', [id]);
+    await pool.execute('DELETE FROM contacts WHERE id = ?', [id]);
     return NextResponse.json({ success: true, message: 'Contact deleted' });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

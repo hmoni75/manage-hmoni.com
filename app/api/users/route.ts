@@ -9,7 +9,7 @@ async function checkAdminPermission() {
     const token = cookies().get('auth_token')?.value;
     if (!token) return false;
     const user = await verifyToken(token);
-    return user?.role === 'admin' || user?.role === 'super_admin';
+    return user?.role === 'admin';
 }
 
 export async function GET() {
@@ -149,7 +149,7 @@ export async function DELETE(request: Request) {
             return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
         }
 
-        await pool.execute('UPDATE users SET is_deleted = 1, isDelete = 1, deleted_at = NOW() WHERE id = ?', [id]);
+        await pool.execute('UPDATE users SET deleted_at = NOW() WHERE id = ?', [id]);
 
         return NextResponse.json({ success: true, message: 'User deleted successfully' });
     } catch (error: any) {
