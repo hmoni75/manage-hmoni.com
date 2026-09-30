@@ -31,6 +31,7 @@ const AppMenu = () => {
         { label: 'Hero Carousel', icon: 'pi pi-fw pi-images', to: '/hero' },
         { label: 'Projects & Highlighted', icon: 'pi pi-fw pi-briefcase', to: '/projects' },
         { label: 'Services', icon: 'pi pi-fw pi-cog', to: '/services' },
+        { label: 'Pricing Plans', icon: 'pi pi-fw pi-dollar', to: '/pricing' },
         { label: 'Process Philosophy', icon: 'pi pi-fw pi-compass', to: '/process' },
         { label: 'Testimonials / Customers', icon: 'pi pi-fw pi-star', to: '/testimonials' },
         { label: 'FAQ', icon: 'pi pi-fw pi-question-circle', to: '/faqs' },
