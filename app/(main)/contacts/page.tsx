@@ -163,9 +163,7 @@ export default function ContactsPage() {
                 </div>
                 <div>
                     <span className="font-bold text-900 block">{row.name}</span>
-                    <span className="text-xs text-500 font-mono">
-                        {row.created_at ? new Date(row.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : '-'}
-                    </span>
+                    <span className="text-xs text-500 font-mono">{row.created_at ? new Date(row.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : '-'}</span>
                 </div>
             </div>
         );
@@ -290,9 +288,7 @@ export default function ContactsPage() {
 
                         <div>
                             <label className="font-bold block mb-1 text-900">Your Message</label>
-                            <div className="surface-100 border-round p-3 text-700 line-height-3 whitespace-pre-wrap font-medium">
-                                {selectedItem.message}
-                            </div>
+                            <div className="surface-100 border-round p-3 text-700 line-height-3 whitespace-pre-wrap font-medium">{selectedItem.message}</div>
                         </div>
 
                         <div className="flex gap-2 mt-2">
@@ -332,55 +328,28 @@ export default function ContactsPage() {
                 <div className="flex flex-column gap-3 pt-2">
                     <div>
                         <label className="font-bold block mb-1">Your name *</label>
-                        <InputText
-                            className="w-full"
-                            placeholder="e.g. John Doe"
-                            value={formData.name || ''}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        />
+                        <InputText className="w-full" placeholder="e.g. John Doe" value={formData.name || ''} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
                     </div>
 
                     <div className="grid">
                         <div className="col-12 md:col-6">
                             <label className="font-bold block mb-1">Your email *</label>
-                            <InputText
-                                className="w-full"
-                                placeholder="e.g. john@example.com"
-                                value={formData.email || ''}
-                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                            />
+                            <InputText className="w-full" placeholder="e.g. john@example.com" value={formData.email || ''} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
                         </div>
                         <div className="col-12 md:col-6">
                             <label className="font-bold block mb-1">Your phone *</label>
-                            <InputText
-                                className="w-full"
-                                placeholder="e.g. +880 1711 000000"
-                                value={formData.phone || ''}
-                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                            />
+                            <InputText className="w-full" placeholder="e.g. +880 1711 000000" value={formData.phone || ''} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
                         </div>
                     </div>
 
                     <div>
                         <label className="font-bold block mb-1">Status</label>
-                        <Dropdown
-                            value={formData.status || 'unread'}
-                            options={statusOptions}
-                            onChange={(e) => setFormData({ ...formData, status: e.value })}
-                            placeholder="Select status"
-                            className="w-full"
-                        />
+                        <Dropdown value={formData.status || 'unread'} options={statusOptions} onChange={(e) => setFormData({ ...formData, status: e.value })} placeholder="Select status" className="w-full" />
                     </div>
 
                     <div>
                         <label className="font-bold block mb-1">Your message *</label>
-                        <InputTextarea
-                            className="w-full"
-                            rows={5}
-                            placeholder="Write message content here..."
-                            value={formData.message || ''}
-                            onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                        />
+                        <InputTextarea className="w-full" rows={5} placeholder="Write message content here..." value={formData.message || ''} onChange={(e) => setFormData({ ...formData, message: e.target.value })} />
                     </div>
                 </div>
             </Dialog>
