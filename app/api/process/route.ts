@@ -7,7 +7,9 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   try {
     await initDB();
-    const [rows] = await pool.execute<RowDataPacket[]>('SELECT * FROM process_philosophy ORDER BY step_number ASC');
+    const [rows] = await pool.execute<RowDataPacket[]>(
+      'SELECT id, step_number, title, description, icon, image_url, created_at, updated_at FROM process_philosophy WHERE deleted_at IS NULL ORDER BY step_number ASC'
+    );
     return NextResponse.json({ success: true, data: rows });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
@@ -18,11 +20,11 @@ export async function POST(req: Request) {
   try {
     await initDB();
     const body = await req.json();
-    const { step_number, title, description, icon } = body;
+    const { step_number, title, description, icon, image_url } = body;
 
     const [result] = await pool.execute<ResultSetHeader>(
-      'INSERT INTO process_philosophy (step_number, title, description, icon) VALUES (?, ?, ?, ?)',
-      [step_number || 1, title, description, icon || 'Compass']
+      'INSERT INTO process_philosophy (step_number, title, description, icon, image_url) VALUES (?, ?, ?, ?, ?)',
+      [step_number || 1, title, description, icon || 'Compass', image_url || null]
     );
 
     return NextResponse.json({ success: true, id: result.insertId, message: 'Process step created' });
@@ -35,13 +37,13 @@ export async function PUT(req: Request) {
   try {
     await initDB();
     const body = await req.json();
-    const { id, step_number, title, description, icon } = body;
+    const { id, step_number, title, description, icon, image_url } = body;
 
     if (!id) return NextResponse.json({ success: false, error: 'ID is required' }, { status: 400 });
 
     await pool.execute(
-      'UPDATE process_philosophy SET step_number = ?, title = ?, description = ?, icon = ? WHERE id = ?',
-      [step_number || 1, title, description, icon || 'Compass', id]
+      'UPDATE process_philosophy SET step_number = ?, title = ?, description = ?, icon = ?, image_url = ? WHERE id = ?',
+      [step_number || 1, title, description, icon || 'Compass', image_url || null, id]
     );
 
     return NextResponse.json({ success: true, message: 'Process step updated' });
@@ -58,7 +60,10 @@ export async function DELETE(req: Request) {
 
     if (!id) return NextResponse.json({ success: false, error: 'ID is required' }, { status: 400 });
 
-    await pool.execute('DELETE FROM process_philosophy WHERE id = ?', [id]);
+    await pool.execute(
+      'UPDATE process_philosophy SET is_deleted = 1, isDelete = 1, deleted_at = NOW() WHERE id = ?',
+      [id]
+    );
     return NextResponse.json({ success: true, message: 'Process step deleted' });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
