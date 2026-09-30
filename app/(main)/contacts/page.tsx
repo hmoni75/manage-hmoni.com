@@ -63,9 +63,7 @@ export default function ContactsPage() {
             });
             const json = await res.json();
             if (json.success) {
-                setData((prev) =>
-                    prev.map((item) => (item.id === id ? { ...item, status: status as any } : item))
-                );
+                setData((prev) => prev.map((item) => (item.id === id ? { ...item, status: status as any } : item)));
                 if (selectedItem && selectedItem.id === id) {
                     setSelectedItem((prev) => (prev ? { ...prev, status: status as any } : null));
                 }
@@ -153,16 +151,11 @@ export default function ContactsPage() {
     const senderBodyTemplate = (row: ContactItem) => {
         return (
             <div className="flex align-items-center gap-2">
-                <div
-                    className="surface-200 border-circle flex align-items-center justify-content-center flex-shrink-0"
-                    style={{ width: '38px', height: '38px' }}
-                >
+                <div className="surface-200 border-circle flex align-items-center justify-content-center flex-shrink-0" style={{ width: '38px', height: '38px' }}>
                     <i className="pi pi-user text-primary font-bold" />
                 </div>
                 <div className="overflow-hidden">
-                    <span className="font-bold text-900 block white-space-nowrap overflow-hidden text-overflow-ellipsis">
-                        {row.name}
-                    </span>
+                    <span className="font-bold text-900 block white-space-nowrap overflow-hidden text-overflow-ellipsis">{row.name}</span>
                     <span className="text-xs text-500 font-mono block">
                         {row.created_at
                             ? new Date(row.created_at).toLocaleDateString(undefined, {
@@ -180,18 +173,12 @@ export default function ContactsPage() {
     const contactInfoTemplate = (row: ContactItem) => {
         return (
             <div className="flex flex-column gap-1 text-sm">
-                <a
-                    href={`mailto:${row.email}`}
-                    className="text-primary hover:underline flex align-items-center gap-1 font-semibold text-overflow-ellipsis overflow-hidden"
-                >
+                <a href={`mailto:${row.email}`} className="text-primary hover:underline flex align-items-center gap-1 font-semibold text-overflow-ellipsis overflow-hidden">
                     <i className="pi pi-envelope text-xs" />
                     <span className="overflow-hidden text-overflow-ellipsis">{row.email}</span>
                 </a>
                 {row.phone ? (
-                    <a
-                        href={`tel:${row.phone}`}
-                        className="text-600 hover:underline flex align-items-center gap-1 text-xs font-mono"
-                    >
+                    <a href={`tel:${row.phone}`} className="text-600 hover:underline flex align-items-center gap-1 text-xs font-mono">
                         <i className="pi pi-phone text-xs" />
                         <span>{row.phone}</span>
                     </a>
@@ -205,10 +192,7 @@ export default function ContactsPage() {
     const messageBodyTemplate = (row: ContactItem) => {
         return (
             <div className="cursor-pointer" onClick={() => viewItem(row)} title="Click to view full message">
-                <p
-                    className="text-sm text-700 m-0 line-height-3 text-overflow-ellipsis overflow-hidden"
-                    style={{ maxHeight: '48px' }}
-                >
+                <p className="text-sm text-700 m-0 line-height-3 text-overflow-ellipsis overflow-hidden" style={{ maxHeight: '48px' }}>
                     {row.message}
                 </p>
             </div>
@@ -217,22 +201,8 @@ export default function ContactsPage() {
 
     const actionBody = (row: ContactItem) => (
         <div className="flex gap-1 justify-content-center">
-            <Button
-                icon="pi pi-eye"
-                rounded
-                text
-                severity="info"
-                onClick={() => viewItem(row)}
-                tooltip="View Full Message"
-            />
-            <Button
-                icon="pi pi-trash"
-                rounded
-                text
-                severity="danger"
-                onClick={() => deleteItem(row.id)}
-                tooltip="Delete"
-            />
+            <Button icon="pi pi-eye" rounded text severity="info" onClick={() => viewItem(row)} tooltip="View Full Message" />
+            <Button icon="pi pi-trash" rounded text severity="danger" onClick={() => deleteItem(row.id)} tooltip="Delete" />
         </div>
     );
 
@@ -246,34 +216,16 @@ export default function ContactsPage() {
                     <div className="flex align-items-center gap-2">
                         <i className="pi pi-envelope text-primary text-2xl" />
                         <h3 className="m-0 font-bold text-900">Contact Inquiries & Messages</h3>
-                        {unreadCount > 0 && (
-                            <Tag severity="danger" value={`${unreadCount} Unread`} className="font-bold ml-2" />
-                        )}
+                        {unreadCount > 0 && <Tag severity="danger" value={`${unreadCount} Unread`} className="font-bold ml-2" />}
                     </div>
-                    <p className="text-600 m-0 mt-1">
-                        Review submissions from website visitors and update their inquiry status
-                    </p>
+                    <p className="text-600 m-0 mt-1">Review submissions from website visitors and update their inquiry status</p>
                 </div>
                 <div className="flex gap-2">
-                    <Button
-                        label="Refresh"
-                        icon="pi pi-refresh"
-                        severity="secondary"
-                        outlined
-                        onClick={fetchData}
-                        loading={loading}
-                    />
+                    <Button label="Refresh" icon="pi pi-refresh" severity="secondary" outlined onClick={fetchData} loading={loading} />
                 </div>
             </div>
 
-            <DataTable
-                value={data}
-                loading={loading}
-                paginator
-                rows={10}
-                responsiveLayout="scroll"
-                emptyMessage="No contact messages found."
-            >
+            <DataTable value={data} loading={loading} paginator rows={10} responsiveLayout="scroll" emptyMessage="No contact messages found.">
                 <Column header="Sender" body={senderBodyTemplate} style={{ width: '22%' }} />
                 <Column header="Contact Info" body={contactInfoTemplate} style={{ width: '24%' }} />
                 <Column header="Your Message" body={messageBodyTemplate} style={{ width: '32%' }} />
@@ -310,30 +262,9 @@ export default function ContactsPage() {
                         <div className="p-3 border-round surface-100 flex flex-column sm:flex-row justify-content-between align-items-start sm:align-items-center gap-2">
                             <span className="text-xs font-bold text-700 uppercase">Change Status:</span>
                             <div className="flex gap-2">
-                                <Button
-                                    label="Unread"
-                                    size="small"
-                                    severity="danger"
-                                    outlined={selectedItem.status !== 'unread'}
-                                    icon="pi pi-envelope"
-                                    onClick={() => updateStatus(selectedItem.id, 'unread')}
-                                />
-                                <Button
-                                    label="Read"
-                                    size="small"
-                                    severity="info"
-                                    outlined={selectedItem.status !== 'read'}
-                                    icon="pi pi-eye"
-                                    onClick={() => updateStatus(selectedItem.id, 'read')}
-                                />
-                                <Button
-                                    label="Responded"
-                                    size="small"
-                                    severity="success"
-                                    outlined={selectedItem.status !== 'responded'}
-                                    icon="pi pi-check"
-                                    onClick={() => updateStatus(selectedItem.id, 'responded')}
-                                />
+                                <Button label="Unread" size="small" severity="danger" outlined={selectedItem.status !== 'unread'} icon="pi pi-envelope" onClick={() => updateStatus(selectedItem.id, 'unread')} />
+                                <Button label="Read" size="small" severity="info" outlined={selectedItem.status !== 'read'} icon="pi pi-eye" onClick={() => updateStatus(selectedItem.id, 'read')} />
+                                <Button label="Responded" size="small" severity="success" outlined={selectedItem.status !== 'responded'} icon="pi pi-check" onClick={() => updateStatus(selectedItem.id, 'responded')} />
                             </div>
                         </div>
 
@@ -345,33 +276,24 @@ export default function ContactsPage() {
                                 </div>
                                 <div className="col-12 md:col-6">
                                     <span className="text-xs text-500 font-semibold block uppercase">Email</span>
-                                    <a
-                                        href={`mailto:${selectedItem.email}`}
-                                        className="text-base text-primary font-bold hover:underline"
-                                    >
+                                    <a href={`mailto:${selectedItem.email}`} className="text-base text-primary font-bold hover:underline">
                                         {selectedItem.email}
                                     </a>
                                 </div>
                                 <div className="col-12 md:col-6">
                                     <span className="text-xs text-500 font-semibold block uppercase">Phone</span>
-                                    <span className="text-base font-bold font-mono text-900">
-                                        {selectedItem.phone || 'N/A'}
-                                    </span>
+                                    <span className="text-base font-bold font-mono text-900">{selectedItem.phone || 'N/A'}</span>
                                 </div>
                                 <div className="col-12 md:col-6">
                                     <span className="text-xs text-500 font-semibold block uppercase">Submitted Date</span>
-                                    <span className="text-sm font-medium text-700">
-                                        {selectedItem.created_at ? new Date(selectedItem.created_at).toLocaleString() : '-'}
-                                    </span>
+                                    <span className="text-sm font-medium text-700">{selectedItem.created_at ? new Date(selectedItem.created_at).toLocaleString() : '-'}</span>
                                 </div>
                             </div>
                         </div>
 
                         <div>
                             <label className="font-bold block mb-1 text-900">Message Content</label>
-                            <div className="surface-100 border-round p-3 text-700 line-height-3 whitespace-pre-wrap font-medium">
-                                {selectedItem.message}
-                            </div>
+                            <div className="surface-100 border-round p-3 text-700 line-height-3 whitespace-pre-wrap font-medium">{selectedItem.message}</div>
                         </div>
 
                         <div className="flex gap-2 mt-2">
@@ -383,10 +305,7 @@ export default function ContactsPage() {
                                 <span>Reply via Email</span>
                             </a>
                             {selectedItem.phone && (
-                                <a
-                                    href={`tel:${selectedItem.phone}`}
-                                    className="p-button p-button-outlined p-button-secondary p-button-sm flex align-items-center gap-2 no-underline"
-                                >
+                                <a href={`tel:${selectedItem.phone}`} className="p-button p-button-outlined p-button-secondary p-button-sm flex align-items-center gap-2 no-underline">
                                     <i className="pi pi-phone" />
                                     <span>Call Phone</span>
                                 </a>
