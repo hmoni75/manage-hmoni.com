@@ -258,7 +258,10 @@ export default function TechStackPage() {
         const raw = row.tags || '';
         let list: string[] = [];
         if (raw) {
-            list = raw.split(',').map((t: string) => t.trim()).filter(Boolean);
+            list = raw
+                .split(',')
+                .map((t: string) => t.trim())
+                .filter(Boolean);
         } else if (row.tags_json) {
             try {
                 list = typeof row.tags_json === 'string' ? JSON.parse(row.tags_json) : row.tags_json;
@@ -272,10 +275,7 @@ export default function TechStackPage() {
         return (
             <div className="flex flex-wrap gap-2">
                 {list.map((tag: string, idx: number) => (
-                    <span
-                        key={idx}
-                        className="inline-flex align-items-center surface-100 border-round-3xl px-3 py-1 text-xs font-semibold text-800 shadow-1 border-1 surface-border"
-                    >
+                    <span key={idx} className="inline-flex align-items-center surface-100 border-round-3xl px-3 py-1 text-xs font-semibold text-800 shadow-1 border-1 surface-border">
                         {tag}
                     </span>
                 ))}
@@ -317,12 +317,7 @@ export default function TechStackPage() {
             <DataTable value={data} loading={loading} paginator rows={10} responsiveLayout="scroll" emptyMessage="No tech stack items found.">
                 <Column field="sort_order" header="#" style={{ width: '6%' }} body={(r) => <span className="font-mono text-500 font-bold">#{r.sort_order || r.id}</span>} />
                 <Column header="Thumbnail" body={imageTemplate} style={{ width: '15%' }} />
-                <Column
-                    field="title"
-                    header="Category / Title"
-                    body={(r) => <span className="font-bold text-900 text-base">{r.title || r.name}</span>}
-                    style={{ width: '20%' }}
-                />
+                <Column field="title" header="Category / Title" body={(r) => <span className="font-bold text-900 text-base">{r.title || r.name}</span>} style={{ width: '20%' }} />
                 <Column header="Tools & Technologies" body={tagsBodyTemplate} style={{ width: '33%' }} />
                 <Column header="Score" body={scoreBodyTemplate} style={{ width: '14%' }} />
                 <Column body={actionBody} header="Actions" style={{ width: '12%' }} />
@@ -374,19 +369,11 @@ export default function TechStackPage() {
                                 </div>
                                 <div className="flex justify-content-between align-items-center gap-2">
                                     <span className="text-xs text-600 font-mono text-overflow-ellipsis overflow-hidden" style={{ maxWidth: '320px' }}>
-                                        {(formData.image_url || formData.thumb || '').startsWith('data:') ? '✅ Uploaded Artwork (Ready)' : (formData.image_url || formData.thumb)}
+                                        {(formData.image_url || formData.thumb || '').startsWith('data:') ? '✅ Uploaded Artwork (Ready)' : formData.image_url || formData.thumb}
                                     </span>
                                     <div className="flex gap-2">
                                         <Button type="button" icon="pi pi-upload" label="Change" size="small" outlined onClick={() => fileInputRef.current?.click()} disabled={uploadingImage} />
-                                        <Button
-                                            type="button"
-                                            icon="pi pi-trash"
-                                            severity="danger"
-                                            size="small"
-                                            text
-                                            onClick={() => setFormData({ ...formData, image_url: '', thumb: '' })}
-                                            tooltip="Remove Thumbnail"
-                                        />
+                                        <Button type="button" icon="pi pi-trash" severity="danger" size="small" text onClick={() => setFormData({ ...formData, image_url: '', thumb: '' })} tooltip="Remove Thumbnail" />
                                     </div>
                                 </div>
                             </div>
@@ -419,23 +406,12 @@ export default function TechStackPage() {
                     <div className="grid">
                         <div className="col-12 md:col-7">
                             <label className="font-bold block mb-1">Category / Stack Title *</label>
-                            <InputText
-                                className="w-full"
-                                placeholder="e.g. Frameworks, Data, MLOps"
-                                value={formData.title || ''}
-                                onChange={(e) => setFormData({ ...formData, title: e.target.value, name: e.target.value, category: e.target.value })}
-                            />
+                            <InputText className="w-full" placeholder="e.g. Frameworks, Data, MLOps" value={formData.title || ''} onChange={(e) => setFormData({ ...formData, title: e.target.value, name: e.target.value, category: e.target.value })} />
                         </div>
                         <div className="col-12 md:col-5">
                             <label className="font-bold block mb-1">Score / 100</label>
                             <div className="p-inputgroup">
-                                <InputNumber
-                                    className="w-full"
-                                    min={0}
-                                    max={100}
-                                    value={formData.score ?? 80}
-                                    onValueChange={(e) => setFormData({ ...formData, score: e.value, proficiency: e.value })}
-                                />
+                                <InputNumber className="w-full" min={0} max={100} value={formData.score ?? 80} onValueChange={(e) => setFormData({ ...formData, score: e.value, proficiency: e.value })} />
                                 <span className="p-inputgroup-addon font-bold">/100</span>
                             </div>
                         </div>
@@ -443,25 +419,14 @@ export default function TechStackPage() {
 
                     <div>
                         <label className="font-bold block mb-1">Tools & Technologies (Comma-separated badges)</label>
-                        <InputText
-                            className="w-full"
-                            placeholder="e.g. PyTorch, TensorFlow, Scikit-learn"
-                            value={formData.tags || ''}
-                            onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                        />
-                        <small className="text-500 block mt-1">
-                            Separate tools with commas (e.g. PyTorch, TensorFlow, Scikit-learn) to display individual pill badges.
-                        </small>
+                        <InputText className="w-full" placeholder="e.g. PyTorch, TensorFlow, Scikit-learn" value={formData.tags || ''} onChange={(e) => setFormData({ ...formData, tags: e.target.value })} />
+                        <small className="text-500 block mt-1">Separate tools with commas (e.g. PyTorch, TensorFlow, Scikit-learn) to display individual pill badges.</small>
                     </div>
 
                     <div className="grid">
                         <div className="col-12 md:col-6">
                             <label className="font-bold block mb-1">Sort Order / Priority</label>
-                            <InputNumber
-                                className="w-full"
-                                value={formData.sort_order || 1}
-                                onValueChange={(e) => setFormData({ ...formData, sort_order: e.value })}
-                            />
+                            <InputNumber className="w-full" value={formData.sort_order || 1} onValueChange={(e) => setFormData({ ...formData, sort_order: e.value })} />
                         </div>
                     </div>
                 </div>
