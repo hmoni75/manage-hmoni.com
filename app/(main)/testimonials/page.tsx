@@ -17,13 +17,11 @@ export default function TestimonialsPage() {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [editingItem, setEditingItem] = useState<any | null>(null);
     const [formData, setFormData] = useState<any>({});
-    const toast = useRef<Toast>(null);
-
-    // Direct image upload states
     const [uploadingImage, setUploadingImage] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
     const [showUrlInput, setShowUrlInput] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const toast = useRef<Toast>(null);
 
     const fetchData = async () => {
         setLoading(true);
@@ -32,8 +30,6 @@ export default function TestimonialsPage() {
             const json = await res.json();
             if (json.success && Array.isArray(json.data)) {
                 setData(json.data);
-            } else {
-                setData([]);
             }
         } catch {
             setData([]);
@@ -48,17 +44,16 @@ export default function TestimonialsPage() {
 
     const processFile = (file: File) => {
         if (!file.type.startsWith('image/')) {
-            toast.current?.show({ severity: 'error', summary: 'Invalid File', detail: 'Please select an image file (PNG, JPG, WEBP, SVG, etc.)' });
+            toast.current?.show({ severity: 'error', summary: 'Invalid File', detail: 'Please select an image file (PNG, JPG, WEBP, etc.)' });
             return;
         }
 
-        if (file.size > 12 * 1024 * 1024) {
-            toast.current?.show({ severity: 'error', summary: 'File Too Large', detail: 'Image must be less than 12MB' });
+        if (file.size > 8 * 1024 * 1024) {
+            toast.current?.show({ severity: 'error', summary: 'File Too Large', detail: 'Photo must be under 8MB' });
             return;
         }
 
         setUploadingImage(true);
-
         const reader = new FileReader();
         reader.onload = (e) => {
             const result = e.target?.result as string;
@@ -67,18 +62,9 @@ export default function TestimonialsPage() {
                 return;
             }
 
-            // SVG / GIF: preserve vector/animation
-            if (file.type.includes('svg') || file.type.includes('gif')) {
-                setFormData((prev: any) => ({ ...prev, image_url: result, avatar: result }));
-                setUploadingImage(false);
-                toast.current?.show({ severity: 'success', summary: 'Photo Ready', detail: `${file.name} uploaded` });
-                return;
-            }
-
-            // For JPG, PNG, WEBP: optimize via canvas for fast loading
             const img = new Image();
             img.onload = () => {
-                const maxDim = 1920;
+                const maxDim = 800;
                 let width = img.width;
                 let height = img.height;
 
@@ -103,7 +89,7 @@ export default function TestimonialsPage() {
                         optimized = canvas.toDataURL('image/jpeg', 0.85);
                     }
                     setFormData((prev: any) => ({ ...prev, image_url: optimized, avatar: optimized }));
-                    toast.current?.show({ severity: 'success', summary: 'Uploaded', detail: `${file.name} uploaded and optimized` });
+                    toast.current?.show({ severity: 'success', summary: 'Photo Ready', detail: `${file.name} uploaded` });
                 } else {
                     setFormData((prev: any) => ({ ...prev, image_url: result, avatar: result }));
                 }
@@ -117,60 +103,23 @@ export default function TestimonialsPage() {
         };
         reader.onerror = () => {
             setUploadingImage(false);
-            toast.current?.show({ severity: 'error', summary: 'Error', detail: 'Could not read image file' });
+            toast.current?.show({ severity: 'error', summary: 'Error', detail: 'Failed to read photo file' });
         };
         reader.readAsDataURL(file);
     };
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            processFile(file);
-        }
-        if (fileInputRef.current) {
-            fileInputRef.current.value = '';
-        }
-    };
-
-    const handleDrop = (e: React.DragEvent) => {
-        e.preventDefault();
-        setIsDragging(false);
-        const file = e.dataTransfer.files?.[0];
-        if (file) {
-            processFile(file);
-        }
-    };
-
-    const handleDragOver = (e: React.DragEvent) => {
-        e.preventDefault();
-        setIsDragging(true);
-    };
-
-    const handleDragLeave = () => {
-        setIsDragging(false);
-    };
-
     const openNew = () => {
         setEditingItem(null);
-        setFormData({ rating: 5, stars: 5, image_url: '', avatar: '', project: '', company: '', client_title: '', role: '' });
+        setFormData({ rating: 5, image_url: '' });
         setShowUrlInput(false);
         setDialogOpen(true);
     };
 
     const editItem = (item: any) => {
         setEditingItem(item);
-        const currentImg = item.image_url || item.avatar || '';
-        setFormData({
-            ...item,
-            client_name: item.client_name || item.author || '',
-            project: item.project || item.company || '',
-            company: item.project || item.company || '',
-            client_title: item.client_title || item.role || '',
-            rating: item.rating || item.stars || 5,
-            image_url: currentImg,
-            avatar: currentImg
-        });
-        setShowUrlInput(Boolean(currentImg && !currentImg.startsWith('data:')));
+        const img = item.image_url || item.avatar || '';
+        setFormData({ ...item, image_url: img });
+        setShowUrlInput(Boolean(img && !img.startsWith('data:')));
         setDialogOpen(true);
     };
 
@@ -191,14 +140,8 @@ export default function TestimonialsPage() {
     };
 
     const saveItem = async () => {
-        const clientName = formData.client_name?.trim() || formData.author?.trim();
-        if (!clientName) {
-            toast.current?.show({ severity: 'warn', summary: 'Required', detail: 'Client / Author Name is required' });
-            return;
-        }
-
-        if (!formData.content || !formData.content.trim()) {
-            toast.current?.show({ severity: 'warn', summary: 'Required', detail: 'Testimonial quote / feedback is required' });
+        if (!formData.client_name || !formData.client_name.trim()) {
+            toast.current?.show({ severity: 'warn', summary: 'Required', detail: 'Client Name is required' });
             return;
         }
 
@@ -224,47 +167,28 @@ export default function TestimonialsPage() {
         }
     };
 
-    const imageTemplate = (row: any) => {
+    const avatarTemplate = (row: any) => {
         const img = row.image_url || row.avatar;
-        if (!img) return <span className="text-400 italic text-sm">No photo</span>;
-        const isDataUrl = img.startsWith('data:');
+        if (!img) {
+            return <div className="w-2rem h-2rem border-circle surface-300 flex align-items-center justify-content-center text-xs font-bold text-700">{(row.client_name || 'U').charAt(0).toUpperCase()}</div>;
+        }
         return (
-            <div className="flex align-items-center gap-2">
-                <img
-                    src={img}
-                    alt={row.client_name || row.author}
-                    className="border-round shadow-1"
-                    style={{ width: '50px', height: '50px', objectFit: 'cover' }}
-                    onError={(e: any) => {
-                        e.target.style.display = 'none';
-                    }}
-                />
-                <span className="text-xs text-500 font-mono text-overflow-ellipsis overflow-hidden" style={{ maxWidth: '80px' }}>
-                    {isDataUrl ? '[Photo Ready]' : img}
-                </span>
-            </div>
-        );
-    };
-
-    const ratingTemplate = (row: any) => {
-        const starCount = Math.min(Math.max(Number(row.rating || row.stars) || 5, 1), 5);
-        return (
-            <div className="flex align-items-center gap-1">
-                {[...Array(5)].map((_, i) => (
-                    <i
-                        key={i}
-                        className={`pi ${i < starCount ? 'pi-star-fill text-yellow-500' : 'pi-star text-300'}`}
-                        style={{ fontSize: '0.85rem' }}
-                    />
-                ))}
-            </div>
+            <img
+                src={img}
+                alt={row.client_name}
+                className="border-circle shadow-1"
+                style={{ width: '36px', height: '36px', objectFit: 'cover' }}
+                onError={(e: any) => {
+                    e.target.style.display = 'none';
+                }}
+            />
         );
     };
 
     const actionBody = (row: any) => (
         <div className="flex gap-2">
-            <Button icon="pi pi-pencil" rounded text severity="info" onClick={() => editItem(row)} tooltip="Edit Testimonial" />
-            <Button icon="pi pi-trash" rounded text severity="danger" onClick={() => deleteItem(row.id)} tooltip="Delete Testimonial" />
+            <Button icon="pi pi-pencil" rounded text severity="info" onClick={() => editItem(row)} tooltip="Edit" />
+            <Button icon="pi pi-trash" rounded text severity="danger" onClick={() => deleteItem(row.id)} tooltip="Delete" />
         </div>
     );
 
@@ -273,8 +197,8 @@ export default function TestimonialsPage() {
             <Toast ref={toast} position="top-right" />
             <div className="flex justify-content-between align-items-center mb-4">
                 <div>
-                    <h3 className="m-0 font-bold text-900">Testimonials & Client Reviews</h3>
-                    <p className="text-600 m-0 mt-1">Manage partner reviews, quotes, client photos, and project ratings</p>
+                    <h3 className="m-0 font-bold text-900">Testimonials & Happy Customers</h3>
+                    <p className="text-600 m-0 mt-1">Manage client reviews, ratings, and social proof</p>
                 </div>
                 <div className="flex gap-2">
                     <Button label="Refresh" icon="pi pi-refresh" severity="secondary" outlined onClick={fetchData} />
@@ -283,41 +207,18 @@ export default function TestimonialsPage() {
             </div>
 
             <DataTable value={data} loading={loading} paginator rows={10} responsiveLayout="scroll" emptyMessage="No testimonials found.">
-                <Column header="Photo" body={imageTemplate} style={{ width: '12%' }} />
-                <Column
-                    field="client_name"
-                    header="Client / Author"
-                    body={(r) => (
-                        <div>
-                            <span className="font-bold text-900 block">{r.client_name || r.author}</span>
-                            <span className="text-xs text-500">{r.client_title || r.role || '-'}</span>
-                        </div>
-                    )}
-                    style={{ width: '18%' }}
-                />
-                <Column
-                    field="project"
-                    header="Project / Company"
-                    body={(r) => <span className="font-semibold text-primary">{r.project || r.company || '-'}</span>}
-                    style={{ width: '18%' }}
-                />
-                <Column header="Rating" body={ratingTemplate} style={{ width: '14%' }} />
-                <Column
-                    field="content"
-                    header="Quote / Feedback"
-                    body={(r) => (
-                        <p className="text-sm text-700 m-0 line-height-3 text-overflow-ellipsis overflow-hidden" style={{ maxHeight: '60px' }}>
-                            &ldquo;{r.content}&rdquo;
-                        </p>
-                    )}
-                    style={{ width: '28%' }}
-                />
-                <Column body={actionBody} header="Actions" style={{ width: '10%' }} />
+                <Column field="id" header="ID" style={{ width: '5%' }} />
+                <Column header="Photo" body={avatarTemplate} style={{ width: '8%' }} />
+                <Column field="client_name" header="Client Name" style={{ width: '22%' }} />
+                <Column field="client_title" header="Role / Company" style={{ width: '20%' }} />
+                <Column field="rating" header="Rating" body={(r) => `${r.rating || 5} ★`} style={{ width: '10%' }} />
+                <Column field="content" header="Feedback" style={{ width: '23%' }} />
+                <Column body={actionBody} header="Actions" style={{ width: '12%' }} />
             </DataTable>
 
             <Dialog
                 visible={dialogOpen}
-                style={{ width: '600px', maxWidth: '95vw' }}
+                style={{ width: '560px', maxWidth: '95vw' }}
                 header={`${editingItem ? 'Edit' : 'Add'} Testimonial`}
                 modal
                 className="p-fluid"
@@ -329,65 +230,86 @@ export default function TestimonialsPage() {
                 }
                 onHide={() => setDialogOpen(false)}
             >
-                <div className="flex flex-column gap-3 pt-2">
-                    {/* Direct Image / Photo Upload Box */}
+                <div className="flex flex-column gap-3">
+                    <div className="grid">
+                        <div className="col-12 md:col-6">
+                            <label className="font-bold block mb-1">Client Name *</label>
+                            <InputText className="w-full" value={formData.client_name || ''} onChange={(e) => setFormData({ ...formData, client_name: e.target.value })} />
+                        </div>
+                        <div className="col-12 md:col-6">
+                            <label className="font-bold block mb-1">Client Role / Company</label>
+                            <InputText className="w-full" placeholder="e.g. CEO at Acme" value={formData.client_title || ''} onChange={(e) => setFormData({ ...formData, client_title: e.target.value })} />
+                        </div>
+                    </div>
+                    <div>
+                        <label className="font-bold block mb-1">Rating (1 to 5)</label>
+                        <InputNumber className="w-full" min={1} max={5} value={formData.rating || 5} onValueChange={(e) => setFormData({ ...formData, rating: e.value })} />
+                    </div>
+                    <div>
+                        <label className="font-bold block mb-1">Testimonial / Review *</label>
+                        <InputTextarea className="w-full" rows={4} value={formData.content || ''} onChange={(e) => setFormData({ ...formData, content: e.target.value })} />
+                    </div>
+
+                    {/* Direct Client Photo Upload */}
                     <div>
                         <div className="flex justify-content-between align-items-center mb-1">
-                            <label className="font-bold">Client / Partner Photo</label>
-                            <Button
-                                type="button"
-                                label={showUrlInput ? 'Switch to File Upload' : 'Enter URL / Path'}
-                                icon={showUrlInput ? 'pi pi-upload' : 'pi pi-link'}
-                                text
-                                size="small"
-                                className="p-0 text-xs"
-                                onClick={() => setShowUrlInput(!showUrlInput)}
-                            />
+                            <label className="font-bold">Client Photo / Avatar</label>
+                            <Button type="button" label={showUrlInput ? 'Upload Photo' : 'Enter URL'} icon={showUrlInput ? 'pi pi-upload' : 'pi pi-link'} text size="small" className="p-0 text-xs" onClick={() => setShowUrlInput(!showUrlInput)} />
                         </div>
 
-                        <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept="image/png,image/jpeg,image/jpg,image/webp,image/gif,image/svg+xml" onChange={handleFileChange} />
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            style={{ display: 'none' }}
+                            accept="image/png,image/jpeg,image/jpg,image/webp,image/gif,image/svg+xml"
+                            onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) processFile(file);
+                                if (fileInputRef.current) fileInputRef.current.value = '';
+                            }}
+                        />
 
-                        {formData.image_url || formData.avatar ? (
+                        {formData.image_url ? (
                             <div className="border-1 border-round surface-border p-3 surface-50">
-                                <div className="relative border-round overflow-hidden shadow-1 mb-2 bg-black-alpha-10 flex align-items-center justify-content-center" style={{ maxHeight: '180px' }}>
+                                <div className="flex align-items-center gap-3">
                                     <img
-                                        src={formData.image_url || formData.avatar}
-                                        alt="Preview"
-                                        style={{ maxWidth: '100%', maxHeight: '180px', objectFit: 'contain' }}
+                                        src={formData.image_url}
+                                        alt="Avatar Preview"
+                                        className="border-circle shadow-1"
+                                        style={{ width: '64px', height: '64px', objectFit: 'cover' }}
                                         onError={(e: any) => {
-                                            e.target.src = 'https://via.placeholder.com/600x300?text=Invalid+Image+URL';
+                                            e.target.src = 'https://via.placeholder.com/100?text=Invalid';
                                         }}
                                     />
-                                </div>
-                                <div className="flex justify-content-between align-items-center gap-2">
-                                    <span className="text-xs text-600 font-mono text-overflow-ellipsis overflow-hidden" style={{ maxWidth: '320px' }}>
-                                        {(formData.image_url || formData.avatar || '').startsWith('data:') ? '✅ Uploaded Photo (Ready)' : (formData.image_url || formData.avatar)}
-                                    </span>
+                                    <div className="flex-1 overflow-hidden">
+                                        <div className="text-xs font-bold text-900 mb-1">Photo Selected</div>
+                                        <span className="text-xs text-500 font-mono text-overflow-ellipsis overflow-hidden block">{formData.image_url.startsWith('data:') ? '✅ Uploaded (Base64 ready)' : formData.image_url}</span>
+                                    </div>
                                     <div className="flex gap-2">
                                         <Button type="button" icon="pi pi-upload" label="Change" size="small" outlined onClick={() => fileInputRef.current?.click()} disabled={uploadingImage} />
-                                        <Button
-                                            type="button"
-                                            icon="pi pi-trash"
-                                            severity="danger"
-                                            size="small"
-                                            text
-                                            onClick={() => setFormData({ ...formData, image_url: '', avatar: '' })}
-                                            tooltip="Remove Photo"
-                                        />
+                                        <Button type="button" icon="pi pi-trash" severity="danger" size="small" text onClick={() => setFormData({ ...formData, image_url: '', avatar: '' })} tooltip="Remove Photo" />
                                     </div>
                                 </div>
                             </div>
                         ) : (
                             <div
                                 onClick={() => fileInputRef.current?.click()}
-                                onDrop={handleDrop}
-                                onDragOver={handleDragOver}
-                                onDragLeave={handleDragLeave}
-                                className={`border-2 border-dashed border-round p-4 text-center cursor-pointer transition-all transition-duration-200 ${isDragging ? 'border-primary surface-100' : 'surface-border surface-50 hover:surface-100'}`}
+                                onDrop={(e) => {
+                                    e.preventDefault();
+                                    setIsDragging(false);
+                                    const file = e.dataTransfer.files?.[0];
+                                    if (file) processFile(file);
+                                }}
+                                onDragOver={(e) => {
+                                    e.preventDefault();
+                                    setIsDragging(true);
+                                }}
+                                onDragLeave={() => setIsDragging(false)}
+                                className={`border-2 border-dashed border-round p-3 text-center cursor-pointer transition-all ${isDragging ? 'border-primary surface-100' : 'surface-border surface-50 hover:surface-100'}`}
                             >
-                                <i className="pi pi-cloud-upload text-4xl text-primary mb-2 block" />
-                                <div className="font-semibold text-900 mb-1">{uploadingImage ? 'Processing Photo...' : 'Click to Upload Photo or Drag & Drop'}</div>
-                                <p className="text-xs text-500 m-0">PNG, JPG, WEBP, GIF, SVG (up to 12MB, auto-optimized)</p>
+                                <i className="pi pi-cloud-upload text-3xl text-primary mb-1 block" />
+                                <div className="font-semibold text-sm text-900 mb-1">{uploadingImage ? 'Processing Photo...' : 'Click to Upload or Drag Photo'}</div>
+                                <p className="text-xs text-500 m-0">PNG, JPG, WEBP (up to 8MB)</p>
                             </div>
                         )}
 
@@ -396,77 +318,11 @@ export default function TestimonialsPage() {
                                 <InputText
                                     className="w-full text-sm"
                                     placeholder="Or paste photo URL (e.g. /assets/imgs/... or https://...)"
-                                    value={formData.image_url || formData.avatar || ''}
+                                    value={formData.image_url || ''}
                                     onChange={(e) => setFormData({ ...formData, image_url: e.target.value, avatar: e.target.value })}
                                 />
                             </div>
                         )}
-                    </div>
-
-                    <div className="grid">
-                        <div className="col-12 md:col-6">
-                            <label className="font-bold block mb-1">Client / Author Name *</label>
-                            <InputText
-                                className="w-full"
-                                placeholder="e.g. Julian Thorne"
-                                value={formData.client_name || formData.author || ''}
-                                onChange={(e) => setFormData({ ...formData, client_name: e.target.value, author: e.target.value })}
-                            />
-                        </div>
-                        <div className="col-12 md:col-6">
-                            <label className="font-bold block mb-1">Project / Company *</label>
-                            <InputText
-                                className="w-full"
-                                placeholder="e.g. The Obsidian Villa"
-                                value={formData.project || formData.company || ''}
-                                onChange={(e) => setFormData({ ...formData, project: e.target.value, company: e.target.value })}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="grid">
-                        <div className="col-12 md:col-6">
-                            <label className="font-bold block mb-1">Role / Designation (Optional)</label>
-                            <InputText
-                                className="w-full"
-                                placeholder="e.g. Owner, Founder, CEO"
-                                value={formData.client_title || formData.role || ''}
-                                onChange={(e) => setFormData({ ...formData, client_title: e.target.value, role: e.target.value })}
-                            />
-                        </div>
-                        <div className="col-12 md:col-6">
-                            <label className="font-bold block mb-1">Rating (Stars 1 to 5)</label>
-                            <div className="flex align-items-center gap-3">
-                                <InputNumber
-                                    className="w-full"
-                                    min={1}
-                                    max={5}
-                                    value={formData.rating || formData.stars || 5}
-                                    onValueChange={(e) => setFormData({ ...formData, rating: e.value, stars: e.value })}
-                                />
-                                <div className="flex gap-1">
-                                    {[1, 2, 3, 4, 5].map((s) => (
-                                        <i
-                                            key={s}
-                                            onClick={() => setFormData({ ...formData, rating: s, stars: s })}
-                                            className={`pi cursor-pointer ${s <= (formData.rating || formData.stars || 5) ? 'pi-star-fill text-yellow-500' : 'pi-star text-300'}`}
-                                            style={{ fontSize: '1.25rem' }}
-                                        />
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label className="font-bold block mb-1">Testimonial Quote / Feedback *</label>
-                        <InputTextarea
-                            className="w-full"
-                            rows={4}
-                            placeholder="The team didn't just design a house; they sculpted a sanctuary of light..."
-                            value={formData.content || ''}
-                            onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                        />
                     </div>
                 </div>
             </Dialog>

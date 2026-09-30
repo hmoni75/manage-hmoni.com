@@ -101,7 +101,7 @@ export default function ExperiencesPage() {
         let finalPeriod = formData.period?.trim();
         if (!finalPeriod) {
             if (formData.start_date) {
-                const end = formData.is_current ? 'Present' : (formData.end_date || 'Present');
+                const end = formData.is_current ? 'Present' : formData.end_date || 'Present';
                 finalPeriod = `${formData.start_date} — ${end}`;
             }
         }
@@ -149,9 +149,7 @@ export default function ExperiencesPage() {
             <div>
                 <div className="font-bold text-900 text-base">{row.position || row.role}</div>
                 <div className="mt-1">
-                    <span className="font-semibold text-primary surface-100 px-2 py-1 border-round text-xs font-mono">
-                        [ {row.company} ]
-                    </span>
+                    <span className="font-semibold text-primary surface-100 px-2 py-1 border-round text-xs font-mono">[ {row.company} ]</span>
                 </div>
             </div>
         );
@@ -213,44 +211,24 @@ export default function ExperiencesPage() {
                     <div className="grid">
                         <div className="col-12 md:col-6">
                             <label className="font-bold block mb-1">Position / Role *</label>
-                            <InputText
-                                className="w-full"
-                                placeholder="e.g. Senior AI Engineer"
-                                value={formData.position || ''}
-                                onChange={(e) => setFormData({ ...formData, position: e.target.value, role: e.target.value })}
-                            />
+                            <InputText className="w-full" placeholder="e.g. Senior AI Engineer" value={formData.position || ''} onChange={(e) => setFormData({ ...formData, position: e.target.value, role: e.target.value })} />
                         </div>
                         <div className="col-12 md:col-6">
                             <label className="font-bold block mb-1">Company / Organization *</label>
-                            <InputText
-                                className="w-full"
-                                placeholder="e.g. Neural Dynamics"
-                                value={formData.company || ''}
-                                onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                            />
+                            <InputText className="w-full" placeholder="e.g. Neural Dynamics" value={formData.company || ''} onChange={(e) => setFormData({ ...formData, company: e.target.value })} />
                         </div>
                     </div>
 
                     <div>
                         <label className="font-bold block mb-1">Period / Duration String (as displayed in portfolio)</label>
-                        <InputText
-                            className="w-full font-mono text-sm"
-                            placeholder="e.g. Jan 2022 — Present or June 2019 — Dec 2021"
-                            value={formData.period || ''}
-                            onChange={(e) => setFormData({ ...formData, period: e.target.value })}
-                        />
+                        <InputText className="w-full font-mono text-sm" placeholder="e.g. Jan 2022 — Present or June 2019 — Dec 2021" value={formData.period || ''} onChange={(e) => setFormData({ ...formData, period: e.target.value })} />
                         <small className="text-500 block mt-1">Leave empty to auto-generate from Start Date and End Date below.</small>
                     </div>
 
                     <div className="grid">
                         <div className="col-12 md:col-6">
                             <label className="font-bold block mb-1">Start Date</label>
-                            <InputText
-                                className="w-full"
-                                placeholder="e.g. Jan 2022"
-                                value={formData.start_date || ''}
-                                onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-                            />
+                            <InputText className="w-full" placeholder="e.g. Jan 2022" value={formData.start_date || ''} onChange={(e) => setFormData({ ...formData, start_date: e.target.value })} />
                         </div>
                         <div className="col-12 md:col-6">
                             <label className="font-bold block mb-1">End Date</label>
@@ -258,7 +236,7 @@ export default function ExperiencesPage() {
                                 className="w-full"
                                 placeholder={formData.is_current ? 'Present' : 'e.g. Dec 2021'}
                                 disabled={formData.is_current}
-                                value={formData.is_current ? 'Present' : (formData.end_date || '')}
+                                value={formData.is_current ? 'Present' : formData.end_date || ''}
                                 onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
                             />
                         </div>
@@ -285,11 +263,7 @@ export default function ExperiencesPage() {
                     <div className="grid">
                         <div className="col-12 md:col-6">
                             <label className="font-bold block mb-1">Sort Order / Priority</label>
-                            <InputNumber
-                                className="w-full"
-                                value={formData.sort_order || 1}
-                                onValueChange={(e) => setFormData({ ...formData, sort_order: e.value })}
-                            />
+                            <InputNumber className="w-full" value={formData.sort_order || 1} onValueChange={(e) => setFormData({ ...formData, sort_order: e.value })} />
                         </div>
                     </div>
 
