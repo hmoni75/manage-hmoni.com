@@ -2,7 +2,6 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { Button } from 'primereact/button';
-import { Card } from 'primereact/card';
 import { InputText } from 'primereact/inputtext';
 import { Toast } from 'primereact/toast';
 import { Dialog } from 'primereact/dialog';
@@ -14,10 +13,8 @@ interface CVData {
     filename: string;
     file_size: number;
     title: string;
-    is_active: number;
     created_at: string;
     updated_at: string;
-    file_data?: string;
 }
 
 export default function CVPage() {
@@ -26,10 +23,12 @@ export default function CVPage() {
     const [uploading, setUploading] = useState(false);
     const [deleteDialog, setDeleteDialog] = useState(false);
     const [titleInput, setTitleInput] = useState('');
+    const [previewKey, setPreviewKey] = useState<number>(Date.now());
     const [selectedFile, setSelectedFile] = useState<{
         filename: string;
         file_data: string;
         file_size: number;
+        blobUrl: string;
     } | null>(null);
     const [dragOver, setDragOver] = useState(false);
 
@@ -44,6 +43,7 @@ export default function CVPage() {
             if (json.success && json.data) {
                 setCvData(json.data);
                 setTitleInput(json.data.title || 'H Moni Curriculum Vitae');
+                setPreviewKey(Date.now());
             } else {
                 setCvData(null);
                 setTitleInput('H Moni Curriculum Vitae');
@@ -52,7 +52,7 @@ export default function CVPage() {
             toast.current?.show({
                 severity: 'error',
                 summary: 'Error',
-                detail: 'Failed to load CV record',
+                detail: err.message || 'Failed to load CV record',
                 life: 3000
             });
         } finally {
@@ -94,13 +94,15 @@ export default function CVPage() {
             return;
         }
 
+        const blobUrl = URL.createObjectURL(file);
         const reader = new FileReader();
         reader.onload = (e) => {
             const base64 = e.target?.result as string;
             setSelectedFile({
                 filename: file.name,
                 file_data: base64,
-                file_size: file.size
+                file_size: file.size,
+                blobUrl
             });
             toast.current?.show({
                 severity: 'info',
@@ -148,12 +150,15 @@ export default function CVPage() {
 
         setUploading(true);
         try {
-            const payload = {
-                filename: selectedFile ? selectedFile.filename : cvData?.filename,
-                file_data: selectedFile ? selectedFile.file_data : cvData?.file_data,
-                file_size: selectedFile ? selectedFile.file_size : cvData?.file_size,
+            const payload: any = {
                 title: titleInput || 'H Moni Curriculum Vitae'
             };
+
+            if (selectedFile) {
+                payload.filename = selectedFile.filename;
+                payload.file_data = selectedFile.file_data;
+                payload.file_size = selectedFile.file_size;
+            }
 
             const res = await fetch('/api/cv', {
                 method: 'POST',
@@ -170,7 +175,7 @@ export default function CVPage() {
                     life: 3000
                 });
                 setSelectedFile(null);
-                fetchCV();
+                await fetchCV();
             } else {
                 throw new Error(json.error || 'Failed to save CV');
             }
@@ -234,7 +239,9 @@ export default function CVPage() {
                                 <i className="pi pi-file-pdf text-red-500 text-3xl"></i>
                                 <h1 className="text-2xl font-bold m-0 text-900">CV / Resume Management</h1>
                             </div>
-                            <p className="text-500 m-0 mt-1">Manage the single official PDF Curriculum Vitae displayed across your portfolio website.</p>
+                            <p className="text-500 m-0 mt-1">
+                                Manage the single official PDF Curriculum Vitae displayed across your portfolio website.
+                            </p>
                         </div>
                         {cvData && (
                             <div className="flex align-items-center gap-2">
@@ -262,7 +269,13 @@ export default function CVPage() {
                                         <label htmlFor="cv_title" className="font-medium text-900 mb-2 block">
                                             Document Title / Label
                                         </label>
-                                        <InputText id="cv_title" value={titleInput} onChange={(e) => setTitleInput(e.target.value)} placeholder="e.g. H Moni Curriculum Vitae" className="w-full" />
+                                        <InputText
+                                            id="cv_title"
+                                            value={titleInput}
+                                            onChange={(e) => setTitleInput(e.target.value)}
+                                            placeholder="e.g. H Moni Curriculum Vitae"
+                                            className="w-full"
+                                        />
                                     </div>
 
                                     {/* Drag and Drop Zone */}
@@ -272,23 +285,47 @@ export default function CVPage() {
                                         onDragLeave={handleDragLeave}
                                         onClick={() => fileInputRef.current?.click()}
                                         className={`border-2 border-dashed border-round-xl p-5 text-center cursor-pointer transition-all transition-duration-200 ${
-                                            dragOver ? 'border-primary surface-100' : selectedFile ? 'border-green-500 surface-50' : 'surface-border hover:surface-50'
+                                            dragOver
+                                                ? 'border-primary surface-100'
+                                                : selectedFile
+                                                ? 'border-green-500 surface-50'
+                                                : 'surface-border hover:surface-50'
                                         }`}
                                     >
-                                        <input ref={fileInputRef} type="file" accept="application/pdf,.pdf" className="hidden" onChange={handleFileInputChange} />
+                                        <input
+                                            ref={fileInputRef}
+                                            type="file"
+                                            accept="application/pdf,.pdf"
+                                            className="hidden"
+                                            onChange={handleFileInputChange}
+                                        />
 
-                                        <i className={`pi ${selectedFile ? 'pi-file-pdf text-green-500' : 'pi-cloud-upload text-500'} text-5xl mb-3`}></i>
+                                        <i
+                                            className={`pi ${
+                                                selectedFile ? 'pi-file-pdf text-green-500' : 'pi-cloud-upload text-500'
+                                            } text-5xl mb-3`}
+                                        ></i>
 
                                         {selectedFile ? (
                                             <div>
-                                                <p className="font-semibold text-900 text-base mb-1">{selectedFile.filename}</p>
-                                                <p className="text-sm text-green-600 font-medium mb-2">Ready to upload ({formatBytes(selectedFile.file_size)})</p>
-                                                <span className="text-xs text-500">Click or drop another file to change</span>
+                                                <p className="font-semibold text-900 text-base mb-1">
+                                                    {selectedFile.filename}
+                                                </p>
+                                                <p className="text-sm text-green-600 font-medium mb-2">
+                                                    Ready to upload ({formatBytes(selectedFile.file_size)})
+                                                </p>
+                                                <span className="text-xs text-500">
+                                                    Click or drop another file to change
+                                                </span>
                                             </div>
                                         ) : (
                                             <div>
-                                                <p className="font-semibold text-900 text-base mb-1">Click to browse or drag & drop PDF here</p>
-                                                <p className="text-xs text-500 mb-0">Accepts single PDF file up to 15MB</p>
+                                                <p className="font-semibold text-900 text-base mb-1">
+                                                    Click to browse or drag & drop PDF here
+                                                </p>
+                                                <p className="text-xs text-500 mb-0">
+                                                    Accepts single PDF file up to 15MB
+                                                </p>
                                             </div>
                                         )}
                                     </div>
@@ -302,7 +339,14 @@ export default function CVPage() {
                                             onClick={handleSave}
                                             className="p-button-primary flex-1"
                                         />
-                                        {selectedFile && <Button icon="pi pi-times" tooltip="Cancel selection" className="p-button-outlined p-button-secondary" onClick={() => setSelectedFile(null)} />}
+                                        {selectedFile && (
+                                            <Button
+                                                icon="pi pi-times"
+                                                tooltip="Cancel selection"
+                                                className="p-button-outlined p-button-secondary"
+                                                onClick={() => setSelectedFile(null)}
+                                            />
+                                        )}
                                     </div>
                                 </div>
 
@@ -327,7 +371,9 @@ export default function CVPage() {
 
                                             <div className="flex justify-content-between align-items-center py-2 border-bottom-1 surface-border">
                                                 <span className="text-500 font-medium">Last Updated</span>
-                                                <span className="text-900">{new Date(cvData.updated_at).toLocaleString()}</span>
+                                                <span className="text-900">
+                                                    {new Date(cvData.updated_at).toLocaleString()}
+                                                </span>
                                             </div>
 
                                             <div className="flex justify-content-between align-items-center py-2 border-bottom-1 surface-border">
@@ -337,17 +383,45 @@ export default function CVPage() {
                                         </div>
 
                                         <div className="flex flex-wrap gap-2 mt-4">
-                                            <a href="/api/cv/download?download=1" target="_blank" rel="noreferrer" className="no-underline flex-1">
-                                                <Button label="Download PDF" icon="pi pi-download" className="p-button-success w-full" />
+                                            <a
+                                                href="/api/cv/download?download=1"
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="no-underline flex-1"
+                                            >
+                                                <Button
+                                                    label="Download PDF"
+                                                    icon="pi pi-download"
+                                                    className="p-button-success w-full"
+                                                />
                                             </a>
 
-                                            <a href="/api/cv/download" target="_blank" rel="noreferrer" className="no-underline flex-1">
-                                                <Button label="Open in New Tab" icon="pi pi-external-link" className="p-button-outlined p-button-info w-full" />
+                                            <a
+                                                href="/api/cv/download"
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="no-underline flex-1"
+                                            >
+                                                <Button
+                                                    label="Open in New Tab"
+                                                    icon="pi pi-external-link"
+                                                    className="p-button-outlined p-button-info w-full"
+                                                />
                                             </a>
 
-                                            <Button icon="pi pi-copy" tooltip="Copy Public Download URL" className="p-button-outlined p-button-secondary" onClick={copyPublicUrl} />
+                                            <Button
+                                                icon="pi pi-copy"
+                                                tooltip="Copy Public Download URL"
+                                                className="p-button-outlined p-button-secondary"
+                                                onClick={copyPublicUrl}
+                                            />
 
-                                            <Button icon="pi pi-trash" tooltip="Delete CV" className="p-button-outlined p-button-danger" onClick={() => setDeleteDialog(true)} />
+                                            <Button
+                                                icon="pi pi-trash"
+                                                tooltip="Delete CV"
+                                                className="p-button-outlined p-button-danger"
+                                                onClick={() => setDeleteDialog(true)}
+                                            />
                                         </div>
                                     </div>
                                 ) : (
@@ -366,19 +440,39 @@ export default function CVPage() {
                                             <i className="pi pi-eye text-primary"></i>
                                             Live PDF Preview
                                         </h3>
-                                        {selectedFile && <Tag severity="warning" value="New File Selected (Unsaved Preview)" />}
+                                        {selectedFile && (
+                                            <Tag severity="warning" value="New File Selected (Unsaved Preview)" />
+                                        )}
                                     </div>
 
-                                    <div className="surface-100 border-1 surface-border border-round-lg flex-1 overflow-hidden" style={{ minHeight: '620px' }}>
-                                        {selectedFile ? (
-                                            <iframe src={selectedFile.file_data} title="PDF Preview (Selected)" width="100%" height="100%" style={{ border: 'none', minHeight: '620px' }} />
-                                        ) : cvData?.file_data ? (
-                                            <iframe src={cvData.file_data} title="PDF Preview (Current)" width="100%" height="100%" style={{ border: 'none', minHeight: '620px' }} />
+                                    <div
+                                        className="surface-100 border-1 surface-border border-round-lg flex-1 overflow-hidden"
+                                        style={{ minHeight: '620px' }}
+                                    >
+                                        {selectedFile?.blobUrl ? (
+                                            <iframe
+                                                src={selectedFile.blobUrl}
+                                                title="PDF Preview (Selected)"
+                                                width="100%"
+                                                height="100%"
+                                                style={{ border: 'none', minHeight: '620px' }}
+                                            />
+                                        ) : cvData ? (
+                                            <iframe
+                                                key={previewKey}
+                                                src={`/api/cv/download?t=${previewKey}`}
+                                                title="PDF Preview (Current)"
+                                                width="100%"
+                                                height="100%"
+                                                style={{ border: 'none', minHeight: '620px' }}
+                                            />
                                         ) : (
                                             <div className="flex flex-column align-items-center justify-content-center h-full py-8 text-500">
                                                 <i className="pi pi-file text-5xl mb-3"></i>
                                                 <p className="m-0 font-medium">No PDF preview available</p>
-                                                <span className="text-xs text-400 mt-1">Upload a CV file to see the embedded preview here</span>
+                                                <span className="text-xs text-400 mt-1">
+                                                    Upload a CV file to see the embedded preview here
+                                                </span>
                                             </div>
                                         )}
                                     </div>
@@ -397,15 +491,27 @@ export default function CVPage() {
                 modal
                 footer={
                     <>
-                        <Button label="Cancel" icon="pi pi-times" className="p-button-text" onClick={() => setDeleteDialog(false)} />
-                        <Button label="Delete CV" icon="pi pi-trash" className="p-button-danger" onClick={handleDelete} />
+                        <Button
+                            label="Cancel"
+                            icon="pi pi-times"
+                            className="p-button-text"
+                            onClick={() => setDeleteDialog(false)}
+                        />
+                        <Button
+                            label="Delete CV"
+                            icon="pi pi-trash"
+                            className="p-button-danger"
+                            onClick={handleDelete}
+                        />
                     </>
                 }
                 onHide={() => setDeleteDialog(false)}
             >
                 <div className="flex align-items-center gap-3">
                     <i className="pi pi-exclamation-triangle text-red-500 text-4xl" />
-                    <span>Are you sure you want to delete the active CV document? Website visitors will no longer be able to download it until you upload a replacement.</span>
+                    <span>
+                        Are you sure you want to delete the active CV document? Website visitors will no longer be able to download it until you upload a replacement.
+                    </span>
                 </div>
             </Dialog>
         </div>

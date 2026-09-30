@@ -11,7 +11,7 @@ export async function GET(req: Request) {
         const download = searchParams.get('download') === '1';
 
         const [rows] = await pool.execute<RowDataPacket[]>(
-            'SELECT filename, file_data FROM cv_resume WHERE is_active = 1 ORDER BY id DESC LIMIT 1'
+            'SELECT filename, file_data FROM cv_resume ORDER BY id DESC LIMIT 1'
         );
 
         if (rows.length === 0 || !rows[0].file_data) {
@@ -31,7 +31,8 @@ export async function GET(req: Request) {
                 'Content-Type': 'application/pdf',
                 'Content-Disposition': `${dispositionType}; filename="${safeFilename}"`,
                 'Content-Length': pdfBuffer.length.toString(),
-                'Cache-Control': 'public, max-age=3600, s-maxage=3600'
+                'Cache-Control': 'public, max-age=60, s-maxage=60',
+                'Access-Control-Allow-Origin': '*'
             }
         });
     } catch (error: any) {

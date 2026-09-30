@@ -6,11 +6,18 @@ import path from 'path';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(req: Request) {
     try {
         await initDB();
+        const { searchParams } = new URL(req.url);
+        const includeData = searchParams.get('include_data') === '1';
+
+        const fields = includeData
+            ? 'id, filename, file_size, title, created_at, updated_at, file_data'
+            : 'id, filename, file_size, title, created_at, updated_at';
+
         const [rows] = await pool.execute<RowDataPacket[]>(
-            'SELECT id, filename, file_size, title, is_active, created_at, updated_at, file_data FROM cv_resume WHERE is_active = 1 ORDER BY id DESC LIMIT 1'
+            `SELECT ${fields} FROM cv_resume ORDER BY id DESC LIMIT 1`
         );
 
         if (rows.length === 0) {
@@ -52,14 +59,14 @@ export async function POST(req: Request) {
             recordId = existing[0].id;
             await pool.execute(
                 `UPDATE cv_resume SET 
-                filename = ?, file_data = ?, file_size = ?, title = ?, is_active = 1, updated_at = NOW() 
+                filename = ?, file_data = ?, file_size = ?, title = ?, updated_at = NOW() 
                 WHERE id = ?`,
                 [finalFilename, file_data, finalSize, finalTitle, recordId]
             );
         } else {
             const [insertResult] = await pool.execute<ResultSetHeader>(
-                `INSERT INTO cv_resume (filename, file_data, file_size, title, is_active) 
-                VALUES (?, ?, ?, ?, 1)`,
+                `INSERT INTO cv_resume (filename, file_data, file_size, title) 
+                VALUES (?, ?, ?, ?)`,
                 [finalFilename, file_data, finalSize, finalTitle]
             );
             recordId = insertResult.insertId;

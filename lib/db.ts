@@ -15,11 +15,13 @@ const getPool = (): mysql.Pool => {
             password: process.env.DB_PASSWORD || '15HBF&~AVNqu',
             database: process.env.DB_NAME || 'hmoni24_hmoni',
             waitForConnections: true,
-            connectionLimit: 3, // Conservative limit per serverless lambda to prevent connection exhaustion
+            connectionLimit: 5,
             queueLimit: 0,
             connectTimeout: 15000,
             enableKeepAlive: true,
-            keepAliveInitialDelay: 0
+            keepAliveInitialDelay: 10000,
+            maxIdle: 2,
+            idleTimeout: 30000
         });
     }
     return global._mysqlPool;
