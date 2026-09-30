@@ -12,13 +12,13 @@ export async function GET(req: Request) {
     const slug = searchParams.get('slug');
 
     if (id) {
-      const [rows] = await pool.execute<RowDataPacket[]>('SELECT * FROM blogs WHERE id = ?', [id]);
+      const [rows] = await pool.execute<RowDataPacket[]>('SELECT * FROM blogs WHERE id = ? AND deleted_at IS NULL', [id]);
       if (rows.length === 0) return NextResponse.json({ success: false, error: 'Blog post not found' }, { status: 404 });
       return NextResponse.json({ success: true, data: rows[0] });
     }
 
     if (slug) {
-      const [rows] = await pool.execute<RowDataPacket[]>('SELECT * FROM blogs WHERE slug = ?', [slug]);
+      const [rows] = await pool.execute<RowDataPacket[]>('SELECT * FROM blogs WHERE slug = ? AND deleted_at IS NULL', [slug]);
       if (rows.length === 0) return NextResponse.json({ success: false, error: 'Blog post not found' }, { status: 404 });
       return NextResponse.json({ success: true, data: rows[0] });
     }
@@ -30,13 +30,26 @@ export async function GET(req: Request) {
         COALESCE(image_url, img, '') as image_url,
         COALESCE(author, 'HMoni Team') as author_name,
         COALESCE(author, 'HMoni Team') as author,
+        author_avatar,
         category,
+        date_str,
         tags,
+        gallery_img1,
+        gallery_img2,
+        banner_img,
+        banner_caption,
+        section1_title,
+        section1_desc,
+        section2_title,
+        section2_desc,
+        details_json,
+        is_published,
         views,
         created_at as published_at,
         created_at
       FROM blogs 
-      ORDER BY created_at DESC, id DESC
+      WHERE deleted_at IS NULL
+      ORDER BY id DESC
     `);
     return NextResponse.json({ success: true, data: rows });
   } catch (error: any) {
@@ -48,15 +61,78 @@ export async function POST(req: Request) {
   try {
     await initDB();
     const body = await req.json();
-    const { title, slug, excerpt, content, cover_image, image_url, author_name, author, category } = body;
+    const {
+      title,
+      slug,
+      excerpt,
+      content,
+      cover_image,
+      image_url,
+      author_name,
+      author,
+      author_avatar,
+      category,
+      date_str,
+      tags,
+      gallery_img1,
+      gallery_img2,
+      banner_img,
+      banner_caption,
+      section1_title,
+      section1_desc,
+      section2_title,
+      section2_desc,
+      details_json,
+      is_published
+    } = body;
+
     const img = cover_image || image_url || '';
     const authorVal = author_name || author || 'HMoni Team';
+    const generatedSlug = slug || (title ? title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') : `blog-${Date.now()}`);
 
-    const generatedSlug = slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+    const detailsObj = details_json || {
+      author_avatar,
+      gallery_img1,
+      gallery_img2,
+      banner_img,
+      banner_caption,
+      section1_title,
+      section1_desc,
+      section2_title,
+      section2_desc
+    };
+
+    const detailsStr = typeof detailsObj === 'string' ? detailsObj : JSON.stringify(detailsObj);
 
     const [result] = await pool.execute<ResultSetHeader>(
-      'INSERT INTO blogs (title, slug, excerpt, content, image_url, author, category, is_published) VALUES (?, ?, ?, ?, ?, ?, ?, 1)',
-      [title, generatedSlug, excerpt || '', content || '', img, authorVal, category || 'General']
+      `INSERT INTO blogs (
+        title, slug, excerpt, content, image_url, img, author, author_avatar, 
+        category, date_str, tags, gallery_img1, gallery_img2, banner_img, banner_caption, 
+        section1_title, section1_desc, section2_title, section2_desc, details_json, is_published
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        title,
+        generatedSlug,
+        excerpt || '',
+        content || '',
+        img,
+        img,
+        authorVal,
+        author_avatar || '',
+        category || 'The World is Changing',
+        date_str || 'Just now',
+        tags || '',
+        gallery_img1 || '',
+        gallery_img2 || '',
+        banner_img || '',
+        banner_caption || '',
+        section1_title || '',
+        section1_desc || '',
+        section2_title || '',
+        section2_desc || '',
+        detailsStr,
+        is_published ?? 1
+      ]
     );
 
     return NextResponse.json({ success: true, id: result.insertId, slug: generatedSlug, message: 'Blog post created' });
@@ -69,16 +145,84 @@ export async function PUT(req: Request) {
   try {
     await initDB();
     const body = await req.json();
-    const { id, title, slug, excerpt, content, cover_image, image_url, author_name, author, category } = body;
-    const img = cover_image || image_url || '';
-    const authorVal = author_name || author || 'HMoni Team';
+    const {
+      id,
+      title,
+      slug,
+      excerpt,
+      content,
+      cover_image,
+      image_url,
+      author_name,
+      author,
+      author_avatar,
+      category,
+      date_str,
+      tags,
+      gallery_img1,
+      gallery_img2,
+      banner_img,
+      banner_caption,
+      section1_title,
+      section1_desc,
+      section2_title,
+      section2_desc,
+      details_json,
+      is_published
+    } = body;
 
     if (!id) return NextResponse.json({ success: false, error: 'Blog ID is required' }, { status: 400 });
-    const generatedSlug = slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+
+    const img = cover_image || image_url || '';
+    const authorVal = author_name || author || 'HMoni Team';
+    const generatedSlug = slug || (title ? title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') : `blog-${Date.now()}`);
+
+    const detailsObj = details_json || {
+      author_avatar,
+      gallery_img1,
+      gallery_img2,
+      banner_img,
+      banner_caption,
+      section1_title,
+      section1_desc,
+      section2_title,
+      section2_desc
+    };
+
+    const detailsStr = typeof detailsObj === 'string' ? detailsObj : JSON.stringify(detailsObj);
 
     await pool.execute(
-      'UPDATE blogs SET title = ?, slug = ?, excerpt = ?, content = ?, image_url = ?, author = ?, category = ? WHERE id = ?',
-      [title, generatedSlug, excerpt || '', content || '', img, authorVal, category || 'General', id]
+      `UPDATE blogs SET 
+        title = ?, slug = ?, excerpt = ?, content = ?, image_url = ?, img = ?, 
+        author = ?, author_avatar = ?, category = ?, date_str = ?, tags = ?, 
+        gallery_img1 = ?, gallery_img2 = ?, banner_img = ?, banner_caption = ?, 
+        section1_title = ?, section1_desc = ?, section2_title = ?, section2_desc = ?, 
+        details_json = ?, is_published = ? 
+      WHERE id = ?`,
+      [
+        title,
+        generatedSlug,
+        excerpt || '',
+        content || '',
+        img,
+        img,
+        authorVal,
+        author_avatar || '',
+        category || 'The World is Changing',
+        date_str || 'Just now',
+        tags || '',
+        gallery_img1 || '',
+        gallery_img2 || '',
+        banner_img || '',
+        banner_caption || '',
+        section1_title || '',
+        section1_desc || '',
+        section2_title || '',
+        section2_desc || '',
+        detailsStr,
+        is_published ?? 1,
+        id
+      ]
     );
 
     return NextResponse.json({ success: true, message: 'Blog post updated' });
@@ -95,7 +239,7 @@ export async function DELETE(req: Request) {
 
     if (!id) return NextResponse.json({ success: false, error: 'Blog ID is required' }, { status: 400 });
 
-    await pool.execute('DELETE FROM blogs WHERE id = ?', [id]);
+    await pool.execute('UPDATE blogs SET is_deleted = 1, isDelete = 1, deleted_at = NOW() WHERE id = ?', [id]);
     return NextResponse.json({ success: true, message: 'Blog post deleted' });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
