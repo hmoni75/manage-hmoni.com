@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
     try {
-        const [rows] = await pool.execute<RowDataPacket[]>('SELECT * FROM tech_stack ORDER BY sort_order ASC, id ASC');
+        const [rows] = await pool.execute<RowDataPacket[]>('SELECT * FROM tech_stack WHERE deleted_at IS NULL ORDER BY sort_order ASC, id ASC');
         return NextResponse.json({ success: true, data: rows });
     } catch (error: any) {
         console.error('TechStack GET error:', error);
@@ -61,7 +61,7 @@ export async function DELETE(req: Request) {
 
         if (!id) return NextResponse.json({ success: false, error: 'ID is required' }, { status: 400 });
 
-        await pool.execute('DELETE FROM tech_stack WHERE id = ?', [id]);
+        await pool.execute('UPDATE tech_stack SET is_deleted = 1, isDelete = 1, deleted_at = NOW() WHERE id = ?', [id]);
         return NextResponse.json({ success: true, message: 'Tech stack item deleted' });
     } catch (error: any) {
         console.error('TechStack DELETE error:', error);

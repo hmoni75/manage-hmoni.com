@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
     try {
         const [rows] = await pool.execute<RowDataPacket[]>(
-            'SELECT * FROM projects ORDER BY is_highlighted DESC, sort_order ASC, id DESC'
+            'SELECT * FROM projects WHERE deleted_at IS NULL ORDER BY is_highlighted DESC, sort_order ASC, id DESC'
         );
         return NextResponse.json({ success: true, data: rows });
     } catch (error: any) {
@@ -205,7 +205,7 @@ export async function DELETE(req: Request) {
 
         if (!id) return NextResponse.json({ success: false, error: 'Project ID is required' }, { status: 400 });
 
-        await pool.execute('DELETE FROM projects WHERE id = ?', [id]);
+        await pool.execute('UPDATE projects SET is_deleted = 1, isDelete = 1, deleted_at = NOW() WHERE id = ?', [id]);
         return NextResponse.json({ success: true, message: 'Project deleted' });
     } catch (error: any) {
         console.error('Projects DELETE error:', error);

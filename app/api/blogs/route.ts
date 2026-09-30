@@ -12,13 +12,13 @@ export async function GET(req: Request) {
     const slug = searchParams.get('slug');
 
     if (id) {
-      const [rows] = await pool.execute<RowDataPacket[]>('SELECT * FROM blogs WHERE id = ?', [id]);
+      const [rows] = await pool.execute<RowDataPacket[]>('SELECT * FROM blogs WHERE id = ? AND deleted_at IS NULL', [id]);
       if (rows.length === 0) return NextResponse.json({ success: false, error: 'Blog post not found' }, { status: 404 });
       return NextResponse.json({ success: true, data: rows[0] });
     }
 
     if (slug) {
-      const [rows] = await pool.execute<RowDataPacket[]>('SELECT * FROM blogs WHERE slug = ?', [slug]);
+      const [rows] = await pool.execute<RowDataPacket[]>('SELECT * FROM blogs WHERE slug = ? AND deleted_at IS NULL', [slug]);
       if (rows.length === 0) return NextResponse.json({ success: false, error: 'Blog post not found' }, { status: 404 });
       return NextResponse.json({ success: true, data: rows[0] });
     }
@@ -36,6 +36,7 @@ export async function GET(req: Request) {
         created_at as published_at,
         created_at
       FROM blogs 
+      WHERE deleted_at IS NULL
       ORDER BY created_at DESC, id DESC
     `);
     return NextResponse.json({ success: true, data: rows });
@@ -95,7 +96,7 @@ export async function DELETE(req: Request) {
 
     if (!id) return NextResponse.json({ success: false, error: 'Blog ID is required' }, { status: 400 });
 
-    await pool.execute('DELETE FROM blogs WHERE id = ?', [id]);
+    await pool.execute('UPDATE blogs SET is_deleted = 1, isDelete = 1, deleted_at = NOW() WHERE id = ?', [id]);
     return NextResponse.json({ success: true, message: 'Blog post deleted' });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
